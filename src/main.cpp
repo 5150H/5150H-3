@@ -4,42 +4,6 @@
 #include "pros/rtos.hpp"
 
 
-
-/*
-void customTurn(Robot* robot, double degrees) {
-    double kb = 0; // 2.1
-
-    double setpoint = degrees;
-    double kp = 0.5;
-	double kd = 20;
-
-    unsigned long last = 0;
-    double error = setpoint;
-    double deriv = 0;
-
-    double prev_error = error;
-
-    while (true) {
-        error = setpoint - robot->odom.heading();
-        deriv = (error - prev_error) / 20.0;
-
-        double output = error * kp + kd * deriv + std::copysign(kb, error);
-        
-        robot->chassis.turn(output);
-
-        if (pros::millis() > last + 50) {
-            std::cout << "error: " << error << ", deriv: " << deriv << ", voltage: "<< output << "\n";
-			last = pros::millis();
-        }
-   
-        prev_error = error;
-        pros::delay(20);
-    } 
-
-    robot->chassis.stop();
-    std::cout << "Heading: " << robot->odom.heading() << "\n";
-}*/
-
 std::unique_ptr<Robot> robot = nullptr;
 std::unique_ptr<Controller> controller = Controller::create(pros::Controller(pros::E_CONTROLLER_MASTER));
 
