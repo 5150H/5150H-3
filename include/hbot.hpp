@@ -57,7 +57,7 @@ public:
             i = 0;
         }
 
-		output = p + i + d + b + f;
+		output = std::clamp(p + i + d + b + f, -12000.0, 12000.0);
 
         prev_error = error;
         prev_reading = reading;
@@ -247,6 +247,9 @@ class Chassis {
 	const int32_t exp_power;
 	const int32_t exp_turn;
 
+	double voltage_percent = 1;
+	double velocity_percent = 1;
+
 	inline double exp_drive(int32_t power, int32_t exponent) {
 		auto value = std::pow((power / 127.0), exponent) / static_cast<double>(std::pow(1, exponent - 1));
     	return value  * 127;
@@ -257,14 +260,24 @@ public:
 	left(ileft), right(iright), exp_power(iexp_power), exp_turn(iexp_turn) {
 	};
 
-	inline void move_voltage(double power, double turn) {
-		left.move_voltage(power + turn);
-		right.move_voltage(power - turn);
+	inline void set_voltage_percent(double percent) {
+		percent /= 100.0;
+		voltage_percent = std::clamp(percent, 0.0, 1.0);
 	}
 
-	inline void move_velocity(double power, double turn) {
-		left.move_velocity(power + turn);
-		right.move_velocity(power - turn);
+	inline void set_velocity_percent(double percent) {
+		percent /= 100.0;
+		velocity_percent = std::clamp(percent, 0.0, 1.0);
+	}
+
+	inline void move_voltage(int32_t power, int32_t turn) {
+		left.move_voltage((power + turn) * voltage_percent);
+		right.move_voltage((power - turn) * voltage_percent);
+	}
+
+	inline void move_velocity(int32_t power, int32_t turn) {
+		left.move_velocity((power + turn) * velocity_percent);
+		right.move_velocity((power - turn) * velocity_percent);
 	}
 
 	inline void drive_voltage(int32_t voltage) {
@@ -345,6 +358,7 @@ class Flywheel {
     pros::Mutex lock;
 
 	bool enabled = false;
+	bool bangbang = false;
 
     void loop() {
         unsigned long interval = controller->get_interval();
@@ -352,9 +366,18 @@ class Flywheel {
             std::unique_lock<pros::Mutex> guard(lock);
         
             if (enabled) {
-                double reading = (sensor.get_velocity() / 360.0 * 60.0);
-                double voltage = controller->step(reading);
-                motors.move_voltage(voltage);
+				if (bangbang) {
+					double reading = (sensor.get_velocity() / 360.0 * 60.0);
+					if (reading < controller->get_setpoint()) {
+						motors.move_voltage(12000);
+					} else {
+						motors.move_voltage(0);
+					}
+				} else {
+					double reading = (sensor.get_velocity() / 360.0 * 60.0);
+                	double voltage = controller->step(reading);
+					motors.move_voltage(voltage);
+				}
             } else {
                 motors.move_voltage(0);
             }
@@ -398,6 +421,14 @@ public:
     inline double rpm() {
         return sensor.get_velocity() / 360.0 * 60.0;
     }
+
+	inline void use_bangbang() {
+		bangbang = true;
+	}
+
+	inline void use_pidf() {
+		bangbang = false;
+	}
 
 	inline static std::unique_ptr<Flywheel> create(std::initializer_list<int8_t> imotors, pros::Rotation isensor, std::unique_ptr<PID> icontroller) {
 		return std::make_unique<Flywheel>(imotors, isensor, std::move(icontroller));
@@ -562,7 +593,7 @@ public:
 	endgame(std::move(iendgame)) {
 	}
 
-    inline void drive_dist(double cm, double error_threshold = 1, unsigned long required_time = 50) {
+    inline void drive_dist(double cm, double error_threshold = 5, unsigned long required_time = 50) {
         std::cout << "[PID] Driving " << cm << " cm\n";
 
 		double straight = controllers->odom->heading();
@@ -604,7 +635,7 @@ public:
         std::cout << "[PID] Finished movement at " << controllers->drive->get_error() << " cm error.\n";
     }
 
-	inline void turn_angle(double degrees, double error_threshold = 5, unsigned long required_time = 50) {
+	inline void turn_angle(double degrees, double error_threshold = 2.5, unsigned long required_time = 50) {
         std::cout << "[PID] Turning " << degrees << " degrees\n";
 
         double offset = controllers->odom->raw_heading();
@@ -644,11 +675,11 @@ public:
         std::cout << "[PID] Finished movement at " << controllers->turn->get_error() << " degrees error.\n";
     }
 
-	inline void turn_to_angle(double degrees) {
+	inline void turn_to_angle(double degrees, double error_threshold = 5) {
 		double heading = controllers->odom->heading();
 		double diff = constrain_angle_180(degrees - heading);
 		std::cout << "[PID] Turning to angle " << degrees << "\n";
-		turn_angle(diff);
+		turn_angle(diff, error_threshold);
 	}
 
 	inline void turn_to_point(double x, double y, bool reverse = false) {
