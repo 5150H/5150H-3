@@ -480,6 +480,14 @@ public:
 		index();
 	}
 
+	inline void repeat(int times, unsigned long interval, unsigned long delay) {
+		for(int i = 0; i < times - 1; i++) {
+			index(delay);
+			pros::delay(interval);
+		}
+		index(delay);
+	}
+
 	inline static std::unique_ptr<Indexer> create(pros::ADIDigitalOut ipiston, unsigned long idelay, unsigned long iinterval) {
 		return std::make_unique<Indexer>(ipiston, idelay, iinterval);
 	}
@@ -593,7 +601,7 @@ public:
 	endgame(std::move(iendgame)) {
 	}
 
-    inline void drive_dist(double cm, double error_threshold = 5, unsigned long required_time = 50) {
+    inline void drive_dist(double cm, double error_threshold = 2, unsigned long required_time = 50) {
         std::cout << "[PID] Driving " << cm << " cm\n";
 
 		double straight = controllers->odom->heading();
@@ -635,7 +643,7 @@ public:
         std::cout << "[PID] Finished movement at " << controllers->drive->get_error() << " cm error.\n";
     }
 
-	inline void turn_angle(double degrees, double error_threshold = 2.5, unsigned long required_time = 50) {
+	inline void turn_angle(double degrees, double error_threshold = 2, unsigned long required_time = 50) {
         std::cout << "[PID] Turning " << degrees << " degrees\n";
 
         double offset = controllers->odom->raw_heading();

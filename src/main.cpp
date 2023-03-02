@@ -27,6 +27,7 @@ void drive_loop() {
 	robot->flywheel->move(2100);
 	robot->flywheel->enable();
 	
+
 	while (true) {
         auto turn = controller->analog(ANALOG_RIGHT_X);
         auto power = controller->analog(ANALOG_LEFT_Y);
@@ -84,7 +85,7 @@ void initialize() {
 	pros::Task pl(print_loop);
 	pros::Task fl(fire_loop);
 	auto controllers = Controllers::create(
-		PID::create(500, 0, 40, 0, 0, 20),
+		PID::create(500, 50, 80, 0, 0, 20),
 		PID::create(500, 0, 50, 0, 0, 20),
 		PID::create(0, 0, 0, 0, 0, 20),
 		Odom::create(
@@ -108,7 +109,7 @@ void initialize() {
 
 	auto indexer = Indexer::create(
 		pros::ADIDigitalOut('B'), 
-		100, 300);
+		50, 250);
 
 	auto anglechg = Anglechg::create(
 		pros::ADIDigitalOut('A'));
@@ -139,32 +140,35 @@ void auto_left() {
 
 void auto_right() {
 	robot->flywheel->enable();
-	robot->flywheel->move(2650);
+	robot->flywheel->move(2450);
+	robot->flywheel->use_pidf();
 
 	robot->drive_to_point(-50, 0, true);
 	robot->turn_to_angle(90);
-	robot->drive_dist(-10);
-	robot->intake->move_for_voltage(500, 12000);
+	robot->drive_dist(-11, 3);
+	robot->intake->move_for_voltage(250, 12000);
 	robot->drive_dist(5);
 
-	robot->turn_to_angle(109);
-	robot->indexer->repeat(2, 1000);
-	robot->flywheel->move(2200);
+	robot->turn_to_angle(103);
+	robot->indexer->repeat(2, 1000, 100);
+	robot->flywheel->move(2250);
 	robot->intake->move_voltage(12000);
 
 	robot->turn_to_angle(220);
 
-	robot->chassis->set_voltage_percent(50);
+	robot->chassis->set_voltage_percent(65);
 	robot->drive_to_point(76, 124.5, true);
 	robot->chassis->set_voltage_percent(100);
 
-	robot->drive_dist(10);
-	robot->turn_to_angle(132.5);
-	robot->indexer->repeat(3, 1000);
+	robot->drive_dist(30);
+	robot->turn_to_angle(140);
+	robot->indexer->repeat(3, 1000, 100);
 
-	robot->drive_dist(-20);
+	/*
+	pros::delay(500);
+	robot->drive_dist(-25, 5);
 	pros::delay(1000);
-	robot->indexer->index();
+	robot->indexer->index();*/
 }
 
 void auto_right_special() {
