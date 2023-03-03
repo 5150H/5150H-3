@@ -26,7 +26,7 @@ void print_loop() {
 void drive_loop() {
 	robot->flywheel->move(2100);
 	robot->flywheel->enable();
-	
+	robot->chassis->set_brake_mode(pros::motor_brake_mode_e_t::E_MOTOR_BRAKE_COAST);
 
 	while (true) {
         auto turn = controller->analog(ANALOG_RIGHT_X);
@@ -70,7 +70,7 @@ void drive_loop() {
 void fire_loop() {
 	while (true) {
 		if(controller->newly_pressed(DIGITAL_R1)) {
-            if(controller->newly_pressed(DIGITAL_R2)) {
+            if(controller->pressed(DIGITAL_R2)) {
                 robot->indexer->index();
             } else {
                 robot->indexer->repeat(3);
@@ -141,7 +141,7 @@ void auto_left() {
 void auto_right() {
 	// start flywheel
 	robot->flywheel->enable();
-	robot->flywheel->move(2450);
+	robot->flywheel->move(2575);
 	robot->flywheel->use_pidf();
 
 	// drive to roller
@@ -149,48 +149,53 @@ void auto_right() {
 	// turn to face roller
 	robot->turn_to_angle(90);
 	// drive into roller
-	robot->drive_dist(-11, 3);
+	robot->drive_dist(-11, 5);
 	// spin for 250ms
 	robot->intake->move_for_voltage(250, 12000);
 	// drive away
 	robot->drive_dist(5);
 
 	// turn to goal
-	robot->turn_to_angle(103);
+	robot->turn_to_angle(107.5);
 	// shoot 2 preloads
 	robot->indexer->repeat(2, 1000, 100);
 	// prepare lower flywheel velocity for next shots
-	robot->flywheel->move(2250);
+	robot->flywheel->move(2225);
 	
-
+	
 	// start intake
 	robot->intake->move_voltage(12000);
 	// turn to 3line
-	robot->turn_to_angle(220);
+	robot->turn_to_angle(222);
 
+	
 	// drive and intake 3 line
 	robot->chassis->set_voltage_percent(65);
-	robot->drive_to_point(76, 124.5, true);
+	robot->drive_to_point(69.69, 107, true);
 	robot->chassis->set_voltage_percent(100);
 
 	// drive back
-	robot->drive_dist(30);
+	robot->drive_dist(15);
 
-	// turn and shoot
-	robot->turn_to_angle(140);
+	robot->turn_to_angle(138);
 	robot->indexer->repeat(3, 1000, 100);
+	robot->flywheel->move(2275);
 
-	// intake 1 disc on boomerang
-	/*
-	pros::delay(500);
-	robot->drive_dist(-25, 5);
-	pros::delay(1000);
-	robot->indexer->index();*/
+	// drive into bomerang
+	robot->drive_dist(-25, 7.5);
+
+	// drive back
+	robot->drive_to_point(57.4, 101.5);
+	// turn to shoot
+	robot->turn_to_angle(139);
+	
+	// shoot
+	robot->indexer->repeat(3, 1000, 100);
 }
 
 void auto_right_special() {
 	robot->flywheel->enable();
-	robot->flywheel->move(2600);
+	robot->flywheel->move(2550);
 
 	robot->intake->move_voltage(12000);
 	robot->drive_to_point(-75, 0, true);
@@ -199,7 +204,7 @@ void auto_right_special() {
 	robot->intake->move_for_voltage(500, 12000);
 	robot->drive_dist(5);
 
-	robot->turn_to_angle(109);
+	robot->turn_to_angle(111);
 	robot->indexer->repeat(3, 1000);
 	robot->flywheel->move(2300);
 	robot->intake->move_voltage(12000);
@@ -216,6 +221,8 @@ void auto_right_special() {
 	robot->drive_dist(-40);
 	pros::delay(1000);
 	robot->indexer->index();
+
+	
 }
 
 void auto_skills() {
