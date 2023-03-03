@@ -139,31 +139,48 @@ void auto_left() {
 }
 
 void auto_right() {
+	// start flywheel
 	robot->flywheel->enable();
 	robot->flywheel->move(2450);
 	robot->flywheel->use_pidf();
 
+	// drive to roller
 	robot->drive_to_point(-50, 0, true);
+	// turn to face roller
 	robot->turn_to_angle(90);
+	// drive into roller
 	robot->drive_dist(-11, 3);
+	// spin for 250ms
 	robot->intake->move_for_voltage(250, 12000);
+	// drive away
 	robot->drive_dist(5);
 
+	// turn to goal
 	robot->turn_to_angle(103);
+	// shoot 2 preloads
 	robot->indexer->repeat(2, 1000, 100);
+	// prepare lower flywheel velocity for next shots
 	robot->flywheel->move(2250);
-	robot->intake->move_voltage(12000);
+	
 
+	// start intake
+	robot->intake->move_voltage(12000);
+	// turn to 3line
 	robot->turn_to_angle(220);
 
+	// drive and intake 3 line
 	robot->chassis->set_voltage_percent(65);
 	robot->drive_to_point(76, 124.5, true);
 	robot->chassis->set_voltage_percent(100);
 
+	// drive back
 	robot->drive_dist(30);
+
+	// turn and shoot
 	robot->turn_to_angle(140);
 	robot->indexer->repeat(3, 1000, 100);
 
+	// intake 1 disc on boomerang
 	/*
 	pros::delay(500);
 	robot->drive_dist(-25, 5);
