@@ -248,13 +248,13 @@ void auto_right_special() {
 }
 
 void auto_skills() {
-	/*
+	
 	robot->flywheel->enable();
-	robot->flywheel->move(2000);
+	robot->flywheel->move(1800);
 	
 	pros::delay(3000);
 
-	robot->indexer->repeat(9, 1000);*/
+	robot->indexer->repeat(9, 1000);
 
 	// heading = 23.5
 
@@ -274,14 +274,49 @@ void auto_skills() {
 	robot->chassis->set_voltage_percent(100);
 
 	robot->turn_to_angle(0);
-	robot->drive_dist(-30);
+	robot->drive_dist(-16.5, 5);
 	pros::delay(750);
-	robot->drive_dist(40);
+	robot->drive_dist(30);
 
 	robot->turn_to_angle(-88);
-	robot->drive_dist(-30);
+	robot->drive_dist(-37.5, 5);
 	pros::delay(750);
-	robot->drive_dist(40);
+	robot->drive_to_point(-112.5, -95);
+	robot->indexer->repeat(3, 1000, 100);
+	robot->turn_to_angle(-218);
+	robot->chassis->set_voltage_percent(50);
+	robot->drive_to_point(12, -199, true);
+	
+	robot->flywheel->move(1950);
+	robot->turn_to_angle(-126);
+	robot->indexer->repeat(3, 1000, 100);
+
+	robot->turn_to_angle(-218);
+	robot->drive_dist(16);
+	robot->turn_to_angle(10);
+	robot->chassis->set_voltage_percent(35);
+	robot->drive_dist(-130);
+	//robot->drive_to_point(-78, -199, true); odom boomerang
+	
+	//robot->drive_dist(-120);
+
+
+	/* attempt to get second match loader
+	robot->intake->move_voltage(0);
+	robot->turn_to_angle(-83);
+	
+	robot->chassis->set_voltage_percent(75);
+	robot->drive_to_point(26.7, -303);
+	
+	robot->turn_to_angle(-190.5);
+	
+	robot->drive_dist(-25, true);
+	
+	robot->turn_to_angle(203.5);
+	robot->drive_dist(10);
+	robot->turn_to_angle(-182.5);
+	robot->drive_dist(-10);
+	*/
 }
 
 void auto_skills_old() {
@@ -299,7 +334,7 @@ void auto_skills_old() {
 }
 
 void autonomous() {
-	auto_right_special();
+	auto_skills();
 }
 
 void opcontrol() {
