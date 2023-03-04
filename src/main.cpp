@@ -8,9 +8,9 @@ std::unique_ptr<Robot> robot = nullptr;
 std::unique_ptr<Controller> controller = Controller::create(pros::Controller(pros::E_CONTROLLER_MASTER));
 
 
-constexpr int32_t FLYWHEEL_NORMAL = 2100;
-constexpr int32_t FLYWHEEL_ANGLECHG = 2000;
-constexpr int32_t FLYWHEEL_OVERFILL = 1900;
+constexpr int32_t FLYWHEEL_NORMAL_RPM = 2100;
+constexpr int32_t FLYWHEEL_ANGLECHG_RPM = 2000;
+constexpr int32_t FLYWHEEL_OVERFILL_RPM = 1800;
 
 void print_loop() {
 	while (true) {
@@ -31,8 +31,8 @@ void drive_loop() {
 	robot->flywheel->enable();
 	robot->chassis->set_brake_mode(pros::motor_brake_mode_e_t::E_MOTOR_BRAKE_COAST);
 
-	int32_t flywheel_normal = 2100;
-	int32_t flywheel_anglechg = 2000;
+	int32_t flywheel_normal_rpm = 2100;
+	int32_t flywheel_anglechg_rpm = 2000;
 	bool toggle_overfill = false;
 
 	while (true) {
@@ -64,9 +64,9 @@ void drive_loop() {
             robot->anglechg->toggle();
 
             if(robot->anglechg->toggled()) {
-                robot->flywheel->move(flywheel_normal);
+                robot->flywheel->move(flywheel_anglechg_rpm);
             } else {
-                robot->flywheel->move(flywheel_anglechg);
+                robot->flywheel->move(flywheel_normal_rpm);
             }
         }
 
@@ -74,9 +74,9 @@ void drive_loop() {
 			toggle_overfill = !toggle_overfill;
 
 			if (toggle_overfill) {
-				flywheel_anglechg = FLYWHEEL_OVERFILL;
+				flywheel_anglechg_rpm = FLYWHEEL_OVERFILL_RPM;
 			} else {
-				flywheel_anglechg = FLYWHEEL_ANGLECHG;
+				flywheel_anglechg_rpm = FLYWHEEL_ANGLECHG_RPM;
 			}
 		}
 		
