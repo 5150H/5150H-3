@@ -8,6 +8,9 @@ std::unique_ptr<Robot> robot = nullptr;
 std::unique_ptr<Controller> controller = Controller::create(pros::Controller(pros::E_CONTROLLER_MASTER));
 
 
+constexpr int32_t FLYWHEEL_NORMAL = 2100;
+constexpr int32_t FLYWHEEL_ANGLECHG = 2000;
+constexpr int32_t FLYWHEEL_OVERFILL = 1900;
 
 void print_loop() {
 	while (true) {
@@ -27,6 +30,10 @@ void drive_loop() {
 	robot->flywheel->move(2100);
 	robot->flywheel->enable();
 	robot->chassis->set_brake_mode(pros::motor_brake_mode_e_t::E_MOTOR_BRAKE_COAST);
+
+	int32_t flywheel_normal = 2100;
+	int32_t flywheel_anglechg = 2000;
+	bool toggle_overfill = false;
 
 	while (true) {
         auto turn = controller->analog(ANALOG_RIGHT_X);
@@ -57,12 +64,22 @@ void drive_loop() {
             robot->anglechg->toggle();
 
             if(robot->anglechg->toggled()) {
-                robot->flywheel->move(2000);
+                robot->flywheel->move(flywheel_normal);
             } else {
-                robot->flywheel->move(2100);
+                robot->flywheel->move(flywheel_anglechg);
             }
         }
 
+		if(controller->newly_pressed(DIGITAL_X)) {
+			toggle_overfill = !toggle_overfill;
+
+			if (toggle_overfill) {
+				flywheel_anglechg = FLYWHEEL_OVERFILL;
+			} else {
+				flywheel_anglechg = FLYWHEEL_ANGLECHG;
+			}
+		}
+		
         pros::delay(5);
     }
 }
