@@ -103,7 +103,7 @@ void initialize() {
 	pros::Task fl(fire_loop);
 	auto controllers = Controllers::create(
 		PID::create(500, 50, 80, 0, 0, 20),
-		PID::create(500, 0, 50, 0, 0, 20),
+		PID::create(560, 0, 50, 0, 0, 20),
 		PID::create(0, 0, 0, 0, 0, 20),
 		Odom::create(
 			pros::Rotation(8), pros::Rotation(6, true), 
@@ -269,16 +269,14 @@ void auto_skills() {
 	robot->flywheel->enable();
 	robot->flywheel->move(1800);
 	
-	pros::delay(3000);
+	
+	pros::delay(2750);
 
 	robot->indexer->repeat(9, 1000);
 
 	// heading = 23.5
 
-	/*
-	robot->chassis->turn_voltage(12000);
-	pros::delay(500);
-	robot->chassis->stop();*/
+	
 
 	robot->drive_to_point(38.5, -1.5);
 
@@ -291,7 +289,7 @@ void auto_skills() {
 	robot->chassis->set_voltage_percent(100);
 
 	robot->turn_to_angle(0);
-	robot->drive_dist(-16.5, 5);
+	robot->drive_dist(-18.25, 5);
 	pros::delay(750);
 	robot->drive_dist(30);
 
@@ -299,7 +297,7 @@ void auto_skills() {
 	robot->drive_dist(-37.5, 5);
 	pros::delay(750);
 	robot->drive_to_point(-112.5, -95);
-	robot->indexer->repeat(3, 1000, 100);
+	robot->indexer->repeat(1, 1000, 100);
 	robot->turn_to_angle(-218);
 	robot->chassis->set_voltage_percent(50);
 	robot->drive_to_point(12, -199, true);
@@ -309,31 +307,41 @@ void auto_skills() {
 	robot->indexer->repeat(3, 1000, 100);
 
 	robot->turn_to_angle(-218);
-	robot->drive_dist(16);
+	robot->drive_dist(16.75);
 	robot->turn_to_angle(10);
 	robot->chassis->set_voltage_percent(35);
 	robot->drive_dist(-130);
-	//robot->drive_to_point(-78, -199, true); odom boomerang
-	
-	//robot->drive_dist(-120);
 
+	robot->chassis->set_voltage_percent(80);
+	robot->flywheel->move(2000);
 
-	/* attempt to get second match loader
-	robot->intake->move_voltage(0);
-	robot->turn_to_angle(-83);
+	robot->turn_to_angle(-307);
+
+	robot->drive_to_point(-80.5, -138);
+	robot->turn_to_angle(-93);
+	robot->indexer->repeat(3, 1000, 100);
+
+	robot->chassis->set_voltage_percent(40);
+
+	robot->turn_to_angle(-135.75);
+
+	robot->drive_dist(-30);
+
+	robot->turn_to_angle(-230);
+
+	//robot->drive_to_point(-68.5, -98.5);
+
+	robot->flywheel->move(2100);
+	robot->drive_to_point(51.5, -174, true);
+	robot->turn_to_angle(-138);
+	robot->indexer->repeat(3, 1000, 100);
+
+	robot->chassis->set_voltage_percent(100);	
+	robot->drive_to_point(79.5, -156.25, true);
+	robot->turn_to_angle(-230);
 	
-	robot->chassis->set_voltage_percent(75);
-	robot->drive_to_point(26.7, -303);
-	
-	robot->turn_to_angle(-190.5);
-	
-	robot->drive_dist(-25, true);
-	
-	robot->turn_to_angle(203.5);
-	robot->drive_dist(10);
-	robot->turn_to_angle(-182.5);
-	robot->drive_dist(-10);
-	*/
+	//robot->indexer->repeat(3, 1000, 100);
+
 }
 
 void auto_skills_old() {
@@ -352,6 +360,10 @@ void auto_skills_old() {
 
 void autonomous() {
 	auto_skills();
+
+	//robot->turn_to_angle(90);
+	//robot->turn_angle(180);
+
 }
 
 void opcontrol() {

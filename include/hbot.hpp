@@ -643,7 +643,7 @@ public:
         std::cout << "[PID] Finished movement at " << controllers->drive->get_error() << " cm error.\n";
     }
 
-	inline void turn_angle(double degrees, double error_threshold = 2, unsigned long required_time = 50) {
+	inline void turn_angle(double degrees, double error_threshold = 2, unsigned long required_time = 150) {
         std::cout << "[PID] Turning " << degrees << " degrees\n";
 
         double offset = controllers->odom->raw_heading();
