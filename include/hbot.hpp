@@ -601,7 +601,7 @@ public:
 	endgame(std::move(iendgame)) {
 	}
 
-    inline void drive_dist(double cm, double error_threshold = 2, unsigned long required_time = 50) {
+    inline void drive_dist(double cm, double error_threshold = 1, unsigned long required_time = 250) {
         std::cout << "[PID] Driving " << cm << " cm\n";
 
 		double straight = controllers->odom->heading();
@@ -630,7 +630,7 @@ public:
             }
 
             double dist = controllers->odom->forward() - offset;
-			double drift = controllers->odom->heading() - straight;
+			double drift = constrain_angle_180(controllers->odom->heading() - straight);
 
             double power = controllers->drive->step(dist);
 			double turn = controllers->angle->step(drift);
@@ -643,7 +643,11 @@ public:
         std::cout << "[PID] Finished movement at " << controllers->drive->get_error() << " cm error.\n";
     }
 
+<<<<<<< Updated upstream
 	inline void turn_angle(double degrees, double error_threshold = 2, unsigned long required_time = 150) {
+=======
+	inline void turn_angle(double degrees, double error_threshold = 1, unsigned long required_time = 250) {
+>>>>>>> Stashed changes
         std::cout << "[PID] Turning " << degrees << " degrees\n";
 
         double offset = controllers->odom->raw_heading();
@@ -674,13 +678,13 @@ public:
 
             double turn = controllers->odom->raw_heading() - offset;
             double voltage = controllers->turn->step(turn);
-			
+			//std::cout << "Error: " << controllers->turn->get_error() << "\n";
             chassis->turn_voltage(voltage);
             pros::delay(interval);
         }   
         
         chassis->stop();
-        std::cout << "[PID] Finished movement at " << controllers->turn->get_error() << " degrees error.\n";
+        std::cout << "[PID] Finished movement at " << controllers->turn->get_error() << " degrees error.\n\n";
     }
 
 	inline void turn_to_angle(double degrees, double error_threshold = 5) {

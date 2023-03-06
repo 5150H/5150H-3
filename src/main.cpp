@@ -7,7 +7,6 @@
 std::unique_ptr<Robot> robot = nullptr;
 std::unique_ptr<Controller> controller = Controller::create(pros::Controller(pros::E_CONTROLLER_MASTER));
 
-
 constexpr int32_t FLYWHEEL_NORMAL_RPM = 2100;
 constexpr int32_t FLYWHEEL_ANGLECHG_RPM = 2000;
 constexpr int32_t FLYWHEEL_OVERFILL_RPM = 1800;
@@ -103,7 +102,11 @@ void initialize() {
 	pros::Task fl(fire_loop);
 	auto controllers = Controllers::create(
 		PID::create(500, 50, 80, 0, 0, 20),
+<<<<<<< Updated upstream
 		PID::create(560, 0, 50, 0, 0, 20),
+=======
+		PID::create(490, 10, 45, 950, 0, 20),
+>>>>>>> Stashed changes
 		PID::create(0, 0, 0, 0, 0, 20),
 		Odom::create(
 			pros::Rotation(8), pros::Rotation(6, true), 
