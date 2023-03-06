@@ -102,11 +102,7 @@ void initialize() {
 	pros::Task fl(fire_loop);
 	auto controllers = Controllers::create(
 		PID::create(500, 50, 80, 0, 0, 20),
-<<<<<<< Updated upstream
-		PID::create(560, 0, 50, 0, 0, 20),
-=======
 		PID::create(490, 10, 45, 950, 0, 20),
->>>>>>> Stashed changes
 		PID::create(0, 0, 0, 0, 0, 20),
 		Odom::create(
 			pros::Rotation(8), pros::Rotation(6, true), 
@@ -161,15 +157,15 @@ void auto_left() {
 void auto_right() {
 	// start flywheel
 	robot->flywheel->enable();
-	robot->flywheel->move(2575);
 	robot->flywheel->use_pidf();
-
+	robot->flywheel->move(2475);
+	
 	// drive to roller
 	robot->drive_to_point(-50, 0, true);
 	// turn to face roller
 	robot->turn_to_angle(90);
 	// drive into roller
-	robot->drive_dist(-11, 5);
+	robot->drive_dist(-12, 5);
 	// spin for 250ms
 	robot->intake->move_for_voltage(250, 12000);
 	// drive away
@@ -197,7 +193,7 @@ void auto_right() {
 	// drive back
 	robot->drive_dist(15);
 
-	robot->turn_to_angle(138);
+	robot->turn_to_angle(142);
 	robot->indexer->repeat(3, 1000, 100);
 	robot->flywheel->move(2275);
 
@@ -362,7 +358,7 @@ void auto_skills_old() {
 }
 
 void autonomous() {
-	auto_skills();
+	auto_right();
 
 	//robot->turn_to_angle(90);
 	//robot->turn_angle(180);
