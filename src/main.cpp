@@ -102,11 +102,7 @@ void initialize() {
 	pros::Task fl(fire_loop);
 	auto controllers = Controllers::create(
 		PID::create(500, 50, 80, 0, 0, 20),
-<<<<<<< Updated upstream
-		PID::create(560, 0, 50, 0, 0, 20),
-=======
-		PID::create(490, 10, 45, 950, 0, 20),
->>>>>>> Stashed changes
+		PID::create(560, 0, 50, 0, 0, 20),//PID::create(490, 10, 45, 950, 0, 20),
 		PID::create(0, 0, 0, 0, 0, 20),
 		Odom::create(
 			pros::Rotation(8), pros::Rotation(6, true), 
@@ -275,7 +271,7 @@ void auto_skills() {
 	
 	pros::delay(2750);
 
-	robot->indexer->repeat(9, 1000);
+	//robot->indexer->repeat(9, 1000);
 
 	// heading = 23.5
 
@@ -290,17 +286,17 @@ void auto_skills() {
 	robot->chassis->set_voltage_percent(50);
 	robot->drive_to_point(-129, -52, true);
 	robot->chassis->set_voltage_percent(100);
-
+	//first roller
 	robot->turn_to_angle(0);
 	robot->drive_dist(-18.25, 5);
 	pros::delay(750);
 	robot->drive_dist(30);
-
+	//second roller
 	robot->turn_to_angle(-88);
 	robot->drive_dist(-37.5, 5);
 	pros::delay(750);
 	robot->drive_to_point(-112.5, -95);
-	robot->indexer->repeat(1, 1000, 100);
+	robot->indexer->repeat(1, 1000, 100); //shoot random shot
 	robot->turn_to_angle(-218);
 	robot->chassis->set_voltage_percent(50);
 	robot->drive_to_point(12, -199, true);
@@ -310,7 +306,7 @@ void auto_skills() {
 	robot->indexer->repeat(3, 1000, 100);
 
 	robot->turn_to_angle(-218);
-	robot->drive_dist(16.75);
+	robot->drive_dist(15);
 	robot->turn_to_angle(10);
 	robot->chassis->set_voltage_percent(35);
 	robot->drive_dist(-130);
@@ -363,10 +359,6 @@ void auto_skills_old() {
 
 void autonomous() {
 	auto_skills();
-
-	//robot->turn_to_angle(90);
-	//robot->turn_angle(180);
-
 }
 
 void opcontrol() {

@@ -601,7 +601,7 @@ public:
 	endgame(std::move(iendgame)) {
 	}
 
-    inline void drive_dist(double cm, double error_threshold = 1, unsigned long required_time = 250) {
+    inline void drive_dist(double cm, double error_threshold = 2.5, unsigned long required_time = 250) {
         std::cout << "[PID] Driving " << cm << " cm\n";
 
 		double straight = controllers->odom->heading();
@@ -643,11 +643,7 @@ public:
         std::cout << "[PID] Finished movement at " << controllers->drive->get_error() << " cm error.\n";
     }
 
-<<<<<<< Updated upstream
-	inline void turn_angle(double degrees, double error_threshold = 2, unsigned long required_time = 150) {
-=======
 	inline void turn_angle(double degrees, double error_threshold = 1, unsigned long required_time = 250) {
->>>>>>> Stashed changes
         std::cout << "[PID] Turning " << degrees << " degrees\n";
 
         double offset = controllers->odom->raw_heading();
