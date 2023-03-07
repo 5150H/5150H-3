@@ -192,7 +192,6 @@ void auto_right() {
 
 	// drive back
 	robot->drive_dist(15);
-
 	robot->turn_to_angle(138);
 	robot->indexer->repeat(3, 1000, 100);
 	robot->flywheel->move(2275);
@@ -273,9 +272,7 @@ void auto_skills() {
 
 	//robot->indexer->repeat(9, 1000);
 
-	// heading = 23.5
-
-	
+	// heading = 23.5	
 
 	robot->drive_to_point(38.5, -1.5);
 
@@ -286,55 +283,63 @@ void auto_skills() {
 	robot->chassis->set_voltage_percent(50);
 	robot->drive_to_point(-129, -52, true);
 	robot->chassis->set_voltage_percent(100);
+
+
 	//first roller
 	robot->turn_to_angle(0);
 	robot->drive_dist(-18.25, 5);
 	pros::delay(750);
 	robot->drive_dist(30);
+
 	//second roller
 	robot->turn_to_angle(-88);
 	robot->drive_dist(-37.5, 5);
 	pros::delay(750);
 	robot->drive_to_point(-112.5, -95);
-	robot->indexer->repeat(1, 1000, 100); //shoot random shot
+	robot->indexer->repeat(3, 1000, 100); //shoot random + extra from match load
+
+	//intake line of 3
 	robot->turn_to_angle(-218);
 	robot->chassis->set_voltage_percent(50);
 	robot->drive_to_point(12, -199, true);
 	
+	//shoot line of 3 from center
 	robot->flywheel->move(1950);
 	robot->turn_to_angle(-126);
 	robot->indexer->repeat(3, 1000, 100);
 
+	//drive back to be on the same axis as left boomerang
 	robot->turn_to_angle(-218);
 	robot->drive_dist(15);
 	robot->turn_to_angle(10);
 	robot->chassis->set_voltage_percent(35);
-	robot->drive_dist(-130);
+	robot->drive_dist(-130); //intake left boomerang
 
+	//angle to drive to shooting position
 	robot->chassis->set_voltage_percent(80);
 	robot->flywheel->move(2000);
-
 	robot->turn_to_angle(-307);
 
+	//shoot boomerang 3
 	robot->drive_to_point(-80.5, -138);
 	robot->turn_to_angle(-93);
 	robot->indexer->repeat(3, 1000, 100);
 
 	robot->chassis->set_voltage_percent(40);
 
+	//intake 1st middle
 	robot->turn_to_angle(-135.75);
-
 	robot->drive_dist(-30);
-
 	robot->turn_to_angle(-230);
 
-	//robot->drive_to_point(-68.5, -98.5);
-
+	//intake two off the middle
 	robot->flywheel->move(2100);
 	robot->drive_to_point(51.5, -174, true);
 	robot->turn_to_angle(-138);
 	robot->indexer->repeat(3, 1000, 100);
 
+
+	//lil bit silly, goofy that must be removed perhaps
 	robot->chassis->set_voltage_percent(100);	
 	robot->drive_to_point(79.5, -156.25, true);
 	robot->turn_to_angle(-230);
