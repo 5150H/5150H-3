@@ -7,7 +7,7 @@
 std::unique_ptr<Robot> robot = nullptr;
 std::unique_ptr<Controller> controller = Controller::create(pros::Controller(pros::E_CONTROLLER_MASTER));
 
-constexpr int32_t FLYWHEEL_NORMAL_RPM = 2050;
+constexpr int32_t FLYWHEEL_NORMAL_RPM = 2100;
 constexpr int32_t FLYWHEEL_ANGLECHG_RPM = 2000;
 constexpr int32_t FLYWHEEL_OVERFILL_RPM = 1900;
 
@@ -293,7 +293,7 @@ void auto_skills() {
 	//second roller
 	robot->turn_to_angle(-88);
 	robot->drive_dist(-37, 5);
-	pros::delay(450);
+	pros::delay(250);
 	robot->drive_to_point(-112.5, -95);
 	robot->indexer->repeat(1, 1000, 100); //shoot random + extra from match load
 
@@ -311,25 +311,29 @@ void auto_skills() {
 
 
 	//drive into first opp line of 3
-	robot->drive_dist(-70);
+	robot->drive_dist(-85);
 
-	robot->turn_to_angle(213.75);
 
-	//robot->drive_to_point(178.5, -213.5, true);
+	robot->turn_to_angle(-223);
 
-	robot->drive_dist(-165);
+	//robot->drive_to_point(156.6, -212.1, true);
 
-	robot->turn_to_angle(-168.5);
+	robot->drive_dist(-145);
 
-	robot->drive_dist(-25, 5);
-	pros::delay(250);
-	robot->drive_dist(30);
-	robot->turn_to_angle(-220);
+	robot->turn_to_angle(-150.7);
 
-	robot->drive_dist(-120);
+	robot->drive_dist(-32);
 	pros::delay(450);
 	robot->drive_dist(30);
 
+	robot->turn_to_angle(-200);
+
+
+	/*
+	robot->drive_dist(-120);
+	
+
+	*/
 
 	/* 
 	//drive back to be on the same axis as left boomerang
