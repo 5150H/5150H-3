@@ -7,9 +7,9 @@
 std::unique_ptr<Robot> robot = nullptr;
 std::unique_ptr<Controller> controller = Controller::create(pros::Controller(pros::E_CONTROLLER_MASTER));
 
-constexpr int32_t FLYWHEEL_NORMAL_RPM = 2100;
+constexpr int32_t FLYWHEEL_NORMAL_RPM = 2050;
 constexpr int32_t FLYWHEEL_ANGLECHG_RPM = 2000;
-constexpr int32_t FLYWHEEL_OVERFILL_RPM = 1800;
+constexpr int32_t FLYWHEEL_OVERFILL_RPM = 1900;
 
 void print_loop() {
 	while (true) {
@@ -263,12 +263,11 @@ void auto_right_special() {
 }
 
 void auto_skills() {
-	
 	robot->flywheel->enable();
 	robot->flywheel->move(1800);
 	
 	
-	pros::delay(2750);
+	//pros::delay(2750);
 
 	//robot->indexer->repeat(9, 1000);
 
@@ -280,7 +279,7 @@ void auto_skills() {
 
 	robot->turn_to_angle(15);
 
-	robot->chassis->set_voltage_percent(50);
+	robot->chassis->set_voltage_percent(80);
 	robot->drive_to_point(-129, -52, true);
 	robot->chassis->set_voltage_percent(100);
 
@@ -288,19 +287,19 @@ void auto_skills() {
 	//first roller
 	robot->turn_to_angle(0);
 	robot->drive_dist(-18.25, 5);
-	pros::delay(750);
-	robot->drive_dist(30);
+	pros::delay(450);
+	robot->drive_dist(33);
 
 	//second roller
 	robot->turn_to_angle(-88);
-	robot->drive_dist(-37.5, 5);
-	pros::delay(750);
+	robot->drive_dist(-37, 5);
+	pros::delay(450);
 	robot->drive_to_point(-112.5, -95);
-	robot->indexer->repeat(3, 1000, 100); //shoot random + extra from match load
+	robot->indexer->repeat(1, 1000, 100); //shoot random + extra from match load
 
 	//intake line of 3
 	robot->turn_to_angle(-218);
-	robot->chassis->set_voltage_percent(50);
+	robot->chassis->set_voltage_percent(65);
 	robot->drive_to_point(12, -199, true);
 	
 	//shoot line of 3 from center
@@ -308,6 +307,31 @@ void auto_skills() {
 	robot->turn_to_angle(-126);
 	robot->indexer->repeat(3, 1000, 100);
 
+	robot->chassis->set_voltage_percent(75);
+
+
+	//drive into first opp line of 3
+	robot->drive_dist(-70);
+
+	robot->turn_to_angle(213.75);
+
+	//robot->drive_to_point(178.5, -213.5, true);
+
+	robot->drive_dist(-165);
+
+	robot->turn_to_angle(-168.5);
+
+	robot->drive_dist(-25, 5);
+	pros::delay(250);
+	robot->drive_dist(30);
+	robot->turn_to_angle(-220);
+
+	robot->drive_dist(-120);
+	pros::delay(450);
+	robot->drive_dist(30);
+
+
+	/* 
 	//drive back to be on the same axis as left boomerang
 	robot->turn_to_angle(-218);
 	robot->drive_dist(15);
@@ -325,7 +349,25 @@ void auto_skills() {
 	robot->turn_to_angle(-93);
 	robot->indexer->repeat(3, 1000, 100);
 
-	robot->chassis->set_voltage_percent(40);
+	
+
+	robot->turn_to_angle(-195);
+	//robot->drive_to_point(165.5, -219.75, true);
+	
+	robot->turn_to_angle(-173);
+
+	robot->drive_dist(-25, 5);
+	pros::delay(250);
+	robot->drive_dist(30);
+	robot->turn_to_angle(-255);
+
+	robot->drive_dist(-120);
+	pros::delay(450);
+	robot->drive_dist(30);
+
+	
+	//robot->drive_to_point(59.8, 180.90);
+
 
 	//intake 1st middle
 	robot->turn_to_angle(-135.75);
@@ -338,13 +380,17 @@ void auto_skills() {
 	robot->turn_to_angle(-138);
 	robot->indexer->repeat(3, 1000, 100);
 
+	
+
 
 	//lil bit silly, goofy that must be removed perhaps
 	robot->chassis->set_voltage_percent(100);	
 	robot->drive_to_point(79.5, -156.25, true);
 	robot->turn_to_angle(-230);
-	
+	*/
+		
 	//robot->indexer->repeat(3, 1000, 100);
+	
 
 }
 
