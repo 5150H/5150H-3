@@ -9,7 +9,7 @@ std::unique_ptr<Controller> controller = Controller::create(pros::Controller(pro
 
 constexpr int32_t FLYWHEEL_NORMAL_RPM = 2100;
 constexpr int32_t FLYWHEEL_ANGLECHG_RPM = 2000;
-constexpr int32_t FLYWHEEL_OVERFILL_RPM = 1800;
+constexpr int32_t FLYWHEEL_OVERFILL_RPM = 1900;
 
 void print_loop() {
 	while (true) {
@@ -26,12 +26,12 @@ void print_loop() {
 }
 
 void drive_loop() {
-	robot->flywheel->move(2100);
+	robot->flywheel->move(FLYWHEEL_NORMAL_RPM);
 	robot->flywheel->enable();
 	robot->chassis->set_brake_mode(pros::motor_brake_mode_e_t::E_MOTOR_BRAKE_COAST);
 
-	int32_t flywheel_normal_rpm = 2100;
-	int32_t flywheel_anglechg_rpm = 2000;
+	int32_t flywheel_normal_rpm = FLYWHEEL_NORMAL_RPM;
+	int32_t flywheel_anglechg_rpm = FLYWHEEL_ANGLECHG_RPM;
 	bool toggle_overfill = false;
 
 	while (true) {
