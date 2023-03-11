@@ -359,7 +359,7 @@ void auto_skills_old() {
 }
 
 void autonomous() {
-	auto_right_special();
+	auto_right();
 
 }
 
