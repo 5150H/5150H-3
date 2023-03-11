@@ -186,7 +186,7 @@ void auto_right() {
 
 	
 	// drive and intake 3 line
-	robot->chassis->set_voltage_percent(65);
+	robot->chassis->set_voltage_percent(75);
 	robot->drive_to_point(69.69, 107, true);
 	robot->chassis->set_voltage_percent(100);
 
@@ -239,7 +239,7 @@ void auto_right_special() {
 	robot->turn_to_angle(222);
 
 	// drive and intake 3 line
-	robot->chassis->set_voltage_percent(65);
+	robot->chassis->set_voltage_percent(75);
 	robot->drive_to_point(51.19, 107, true);
 	robot->chassis->set_voltage_percent(100);
 
@@ -286,6 +286,7 @@ void auto_skills() {
 
 	//first roller
 	robot->turn_to_angle(0);
+<<<<<<< Updated upstream
 	robot->drive_dist(-18.25, 5);
 	pros::delay(450);
 	robot->drive_dist(33);
@@ -293,20 +294,42 @@ void auto_skills() {
 	//second roller
 	robot->turn_to_angle(-88);
 	robot->drive_dist(-37, 5);
+=======
+	robot->drive_dist(-17, 5);
+	pros::delay(200);
+	robot->drive_dist(24);
+
+	//second roller
+	robot->turn_to_angle(-80);
+	robot->drive_dist(-33.5, 5);
+>>>>>>> Stashed changes
 	pros::delay(250);
 	robot->drive_to_point(-112.5, -95);
 	robot->indexer->repeat(1, 1000, 100); //shoot random + extra from match load
 
+<<<<<<< Updated upstream
 	//intake line of 3
 	robot->turn_to_angle(-218);
 	robot->chassis->set_voltage_percent(65);
 	robot->drive_to_point(12, -199, true);
 	
 	//shoot line of 3 from center
+=======
+>>>>>>> Stashed changes
 	robot->flywheel->move(1950);
-	robot->turn_to_angle(-126);
+
+	//intake line of 3
+	robot->turn_to_angle(-213);
+	robot->chassis->set_voltage_percent(65);
+	robot->drive_to_point(23.5, -182.5, true);
+	
+	robot->chassis->set_voltage_percent(85);
+
+	//shoot line of 3 from center
+	robot->turn_to_angle(-116.5);
 	robot->indexer->repeat(3, 1000, 100);
 
+<<<<<<< Updated upstream
 	robot->chassis->set_voltage_percent(75);
 
 
@@ -314,21 +337,63 @@ void auto_skills() {
 	robot->drive_dist(-85);
 
 
+=======
+	robot->turn_to_angle(-114);
+	robot->drive_to_point(55.8, -107.75, true);
+
+	robot->turn_to_angle(-202.5);
+
+	robot->drive_to_point(112, -132, true);
+
+	robot->flywheel->move(2000);
+
+	robot->turn_to_angle(-264.5);
+
+	robot->indexer->repeat(3, 1000, 100);
+
+	robot->turn_to_angle(-219);
+
+	robot->drive_to_point(180, -185);
+
+	robot->turn_to_angle(-161.5);
+
+/*
+
+// -264.5
+	
+>>>>>>> Stashed changes
 	robot->turn_to_angle(-223);
 
 	//robot->drive_to_point(156.6, -212.1, true);
 
+<<<<<<< Updated upstream
 	robot->drive_dist(-145);
 
 	robot->turn_to_angle(-150.7);
 
+=======
+	//drive to roller & intake second in line of 3
+	robot->drive_dist(-145);
+
+	//turn to face roller
+	robot->turn_to_angle(183);
+
+	//roller
+>>>>>>> Stashed changes
 	robot->drive_dist(-32);
 	pros::delay(450);
 	robot->drive_dist(30);
 
+<<<<<<< Updated upstream
 	robot->turn_to_angle(-200);
 
 
+=======
+	//turn to second roller/intake 3rd
+	robot->turn_to_angle(96);
+
+*/
+>>>>>>> Stashed changes
 	/*
 	robot->drive_dist(-120);
 	
@@ -413,7 +478,20 @@ void auto_skills_old() {
 }
 
 void autonomous() {
+<<<<<<< Updated upstream
 	auto_skills();
+=======
+<<<<<<< Updated upstream
+	auto_right();
+
+	//robot->turn_to_angle(90);
+	//robot->turn_angle(180);
+
+=======
+	//Hi judges! - Aahil
+	auto_skills();
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 }
 
 void opcontrol() {
