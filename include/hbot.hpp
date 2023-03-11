@@ -601,7 +601,7 @@ public:
 	endgame(std::move(iendgame)) {
 	}
 
-    inline void drive_dist(double cm, double error_threshold = 2.5, unsigned long required_time = 250) {
+    inline void drive_dist(double cm, double error_threshold = 2, unsigned long required_time = 250) {
         std::cout << "[PID] Driving " << cm << " cm\n";
 
 		double straight = controllers->odom->heading();
@@ -643,6 +643,55 @@ public:
         std::cout << "[PID] Finished movement at " << controllers->drive->get_error() << " cm error.\n";
     }
 
+	inline void drive_dist_timeout(double cm, unsigned long timeout, double error_threshold = 2, unsigned long required_time = 250) {
+		std::cout << "[PID] Driving " << cm << " cm\n";
+
+		double straight = controllers->odom->heading();
+        double offset = controllers->odom->forward();
+        controllers->drive->target(cm);
+        unsigned long interval = controllers->drive->get_interval();
+        
+        bool settling = false;
+        unsigned long settled_time = 0;
+		unsigned long start_time = pros::millis();
+
+        while (true) {
+            if (!settling && std::abs(controllers->drive->get_error()) < error_threshold) {
+                settled_time = pros::millis();
+                settling = true;
+            }
+
+            if(settling) {
+                if (std::abs(controllers->drive->get_error()) < error_threshold) {
+                    unsigned long current_time = pros::millis();
+                    unsigned long diff_time = current_time - settled_time;
+                    if (diff_time > required_time) {
+                        break;
+                    }
+                } else {
+                    settling = false;
+                }
+            }
+
+			unsigned long current_time = pros::millis();
+			if(current_time - start_time > timeout) {
+				break;
+			}
+
+            double dist = controllers->odom->forward() - offset;
+			double drift = constrain_angle_180(controllers->odom->heading() - straight);
+
+            double power = controllers->drive->step(dist);
+			double turn = controllers->angle->step(drift);
+
+            chassis->move_voltage(power, turn);
+            pros::delay(interval);
+        }   
+        
+        chassis->stop();
+        std::cout << "[PID] Finished movement at " << controllers->drive->get_error() << " cm error.\n";
+	}
+
 	inline void turn_angle(double degrees, double error_threshold = 1, unsigned long required_time = 250) {
         std::cout << "[PID] Turning " << degrees << " degrees\n";
 
@@ -683,11 +732,65 @@ public:
         std::cout << "[PID] Finished movement at " << controllers->turn->get_error() << " degrees error.\n\n";
     }
 
+	inline void turn_angle_timeout(double degrees, unsigned long timeout, double error_threshold = 1, unsigned long required_time = 250) {
+        std::cout << "[PID] Turning " << degrees << " degrees\n";
+
+        double offset = controllers->odom->raw_heading();
+        controllers->turn->target(degrees);
+
+        unsigned long interval = controllers->turn->get_interval();
+        
+        bool settling_err = false;
+        unsigned long err_time = 0;
+		unsigned long start_time = pros::millis();
+
+        while (true) {
+
+            if (!settling_err && std::abs(controllers->turn->get_error()) < error_threshold) {
+                err_time = pros::millis();
+                settling_err = true;
+            }
+
+            if(settling_err) {
+                if (std::abs(controllers->turn->get_error()) < error_threshold) {
+                    unsigned long current_time = pros::millis();
+                    unsigned long diff_time = current_time - err_time;
+                    if (diff_time > required_time) {
+                        break;
+                    } 
+				} else {
+                    settling_err = false;
+                }
+            }
+
+			unsigned long current_time = pros::millis();
+			if (current_time - start_time > timeout) {
+				break;
+			}
+
+            double turn = controllers->odom->raw_heading() - offset;
+            double voltage = controllers->turn->step(turn);
+			//std::cout << "Error: " << controllers->turn->get_error() << "\n";
+            chassis->turn_voltage(voltage);
+            pros::delay(interval);
+        }   
+        
+        chassis->stop();
+        std::cout << "[PID] Finished movement at " << controllers->turn->get_error() << " degrees error.\n\n";
+    }
+
 	inline void turn_to_angle(double degrees, double error_threshold = 5) {
 		double heading = controllers->odom->heading();
 		double diff = constrain_angle_180(degrees - heading);
 		std::cout << "[PID] Turning to angle " << degrees << "\n";
 		turn_angle(diff, error_threshold);
+	}
+
+	inline void turn_to_angle_timeout(double degrees, unsigned long ms, double error_threshold = 5) {
+		double heading = controllers->odom->heading();
+		double diff = constrain_angle_180(degrees - heading);
+		std::cout << "[PID] Turning to angle " << degrees << "\n";
+		turn_angle_timeout(diff, ms, error_threshold);
 	}
 
 	inline void turn_to_point(double x, double y, bool reverse = false) {
