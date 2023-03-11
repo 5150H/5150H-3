@@ -78,7 +78,7 @@ void drive_loop() {
 				flywheel_anglechg_rpm = FLYWHEEL_ANGLECHG_RPM;
 			}
 		}
-		
+
         pros::delay(5);
     }
 }
@@ -92,6 +92,11 @@ void fire_loop() {
                 robot->indexer->repeat(3);
             }
         }
+
+		if(controller->newly_pressed(DIGITAL_DOWN)) {
+			robot->indexer->repeat(7, 1000, 100);
+		}
+
 		pros::delay(5);
 	}
 }
