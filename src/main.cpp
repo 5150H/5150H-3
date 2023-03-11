@@ -158,14 +158,14 @@ void auto_right() {
 	// start flywheel
 	robot->flywheel->enable();
 	robot->flywheel->use_pidf();
-	robot->flywheel->move(2475);
+	robot->flywheel->move(2400);
 	
 	// drive to roller
-	robot->drive_to_point(-50, 0, true);
+	robot->drive_dist_timeout(-50, 750, true);
 	// turn to face roller
 	robot->turn_to_angle(90);
 	// drive into roller
-	robot->drive_dist(-12, 5);
+	robot->drive_dist_timeout(-15, 1000, 5);
 	// spin for 250ms
 	robot->intake->move_for_voltage(250, 12000);
 	// drive away
@@ -176,7 +176,7 @@ void auto_right() {
 	// shoot 2 preloads
 	robot->indexer->repeat(2, 1000, 100);
 	// prepare lower flywheel velocity for next shots
-	robot->flywheel->move(2225);
+	robot->flywheel->move(2230);
 	
 	
 	// start intake
@@ -193,17 +193,17 @@ void auto_right() {
 	// drive back
 	robot->drive_dist(15);
 
-	robot->turn_to_angle(142);
+	robot->turn_to_angle(145);
 	robot->indexer->repeat(3, 1000, 100);
-	robot->flywheel->move(2275);
+	robot->flywheel->move(2250);
 
 	// drive into bomerang
-	robot->drive_dist(-25, 7.5);
+	robot->drive_dist_timeout(-25, 500, 7.5);
 
 	// drive back
 	robot->drive_to_point(57.4, 101.5);
 	// turn to shoot
-	robot->turn_to_angle(139);
+	robot->turn_to_angle(143);
 	
 	// shoot
 	robot->indexer->repeat(3, 1000, 100);
@@ -212,55 +212,57 @@ void auto_right() {
 void auto_right_special() {
 	// start flywheel
 	robot->flywheel->enable();
-	robot->flywheel->move(2575);
 	robot->flywheel->use_pidf();
-
-	// start intake
-	robot->intake->move_voltage(12000);
+	robot->flywheel->move(2400);
+	
 	// drive to roller
-	robot->drive_to_point(-68.5, 0, true);
+	robot->drive_dist(-68,5, true);
 	// turn to face roller
 	robot->turn_to_angle(90);
 	// drive into roller
-	robot->drive_dist(-11, 5);
+	robot->drive_dist_timeout(-15, 750, 5);
 	// spin for 250ms
 	robot->intake->move_for_voltage(250, 12000);
 	// drive away
 	robot->drive_dist(5);
 
 	// turn to goal
-	robot->turn_to_angle(107.5);
+	robot->turn_to_angle(105.5);
 	// shoot 2 preloads
-	robot->indexer->repeat(3, 1000, 100);
+	robot->indexer->repeat(3, 750, 100);
 	// prepare lower flywheel velocity for next shots
-	robot->flywheel->move(2225);
+	robot->flywheel->move(2240);
 	
-	// turn to 3line
+	
+	// start intake
 	robot->intake->move_voltage(12000);
+	// turn to 3line
 	robot->turn_to_angle(222);
 
+	
 	// drive and intake 3 line
 	robot->chassis->set_voltage_percent(65);
-	robot->drive_to_point(51.19, 107, true);
+	robot->drive_to_point(51.14, 107, true);
 	robot->chassis->set_voltage_percent(100);
 
 	// drive back
 	robot->drive_dist(15);
 
-	robot->turn_to_angle(138);
-	robot->indexer->repeat(3, 1000, 100);
-	robot->flywheel->move(2275);
+	robot->turn_to_angle(145);
+	robot->indexer->repeat(3, 750, 100);
+	robot->flywheel->move(2250);
 
 	// drive into bomerang
-	robot->drive_dist(-25, 7.5);
+	robot->drive_dist_timeout(-6.5, 10000, 7.5);
 
+/*
 	// drive back
-	robot->drive_to_point(38.9, 101.5);
+	robot->drive_to_point(75.4, 101.5, true);
 	// turn to shoot
-	robot->turn_to_angle(139);
+	robot->turn_to_angle(143);
 	
 	// shoot
-	robot->indexer->repeat(3, 1000, 100);
+	robot->indexer->repeat(3, 1000, 100);*/
 }
 
 void auto_skills() {
@@ -274,7 +276,6 @@ void auto_skills() {
 	robot->indexer->repeat(9, 1000);
 
 	// heading = 23.5
-
 	
 
 	robot->drive_to_point(38.5, -1.5);
@@ -358,10 +359,7 @@ void auto_skills_old() {
 }
 
 void autonomous() {
-	auto_right();
-
-	//robot->turn_to_angle(90);
-	//robot->turn_angle(180);
+	auto_right_special();
 
 }
 

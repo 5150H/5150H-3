@@ -786,6 +786,13 @@ public:
 		turn_angle(diff, error_threshold);
 	}
 
+	inline void turn_to_angle_timeout(double degrees, unsigned long ms, double error_threshold = 5) {
+		double heading = controllers->odom->heading();
+		double diff = constrain_angle_180(degrees - heading);
+		std::cout << "[PID] Turning to angle " << degrees << "\n";
+		turn_angle_timeout(diff, ms, error_threshold);
+	}
+
 	inline void turn_to_point(double x, double y, bool reverse = false) {
 		double angle = calc_angle_to_point(x, y, reverse);
 		std::cout << "[Odom] Turning to point (" << x << ", " << y << ")\n";
