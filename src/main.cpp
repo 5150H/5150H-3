@@ -168,7 +168,7 @@ void auto_right() {
 	// start flywheel
 	robot->flywheel->enable();
 	robot->flywheel->use_pidf();
-	robot->flywheel->move(2400);
+	robot->flywheel->move(2475);
 	
 	// drive to roller
 	robot->drive_dist_timeout(-50, 750, true);
@@ -203,7 +203,7 @@ void auto_right() {
 	// drive back
 	robot->drive_dist(15);
 
-	robot->turn_to_angle(145);
+	robot->turn_to_angle(146);
 	robot->indexer->repeat(3, 1000, 100);
 	robot->flywheel->move(2250);
 
@@ -213,7 +213,7 @@ void auto_right() {
 	// drive back
 	robot->drive_to_point(57.4, 101.5);
 	// turn to shoot
-	robot->turn_to_angle(143);
+	robot->turn_to_angle(145);
 	
 	// shoot
 	robot->indexer->repeat(3, 1000, 100);
