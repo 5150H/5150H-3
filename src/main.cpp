@@ -151,7 +151,17 @@ void shoot() {
 }
 
 void auto_left() {
+	// start flywheel
+	robot->flywheel->enable();
+	robot->flywheel->use_pidf();
+	robot->flywheel->move(2400);
 
+	robot->drive_dist_timeout(-7.5, 1000, 5);
+	robot->intake->move_for_voltage(250, 12000);
+	robot->drive_dist(10);
+	robot->turn_to_angle(-3);
+
+	robot->indexer->repeat(2, 1000, 100);
 }
 
 void auto_right() {
