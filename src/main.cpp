@@ -168,7 +168,7 @@ void auto_right() {
 	// start flywheel
 	robot->flywheel->enable();
 	robot->flywheel->use_pidf();
-	robot->flywheel->move(2475);
+	robot->flywheel->move(2460);
 	
 	// drive to roller
 	robot->drive_dist_timeout(-50, 750, true);
@@ -182,11 +182,11 @@ void auto_right() {
 	robot->drive_dist(5);
 
 	// turn to goal
-	robot->turn_to_angle(105.5);
+	robot->turn_to_angle(103.5);
 	// shoot 2 preloads
 	robot->indexer->repeat(2, 1000, 100);
 	// prepare lower flywheel velocity for next shots
-	robot->flywheel->move(2230);
+	robot->flywheel->move(2225);
 	
 	
 	// start intake
@@ -202,18 +202,17 @@ void auto_right() {
 
 	// drive back
 	robot->drive_dist(15);
-
-	robot->turn_to_angle(146);
+	robot->turn_to_angle(147);
 	robot->indexer->repeat(3, 1000, 100);
-	robot->flywheel->move(2250);
+	robot->flywheel->move(2275);
 
 	// drive into bomerang
-	robot->drive_dist_timeout(-25, 500, 7.5);
+	robot->drive_dist_timeout(-25, 550, 7.5);
 
 	// drive back
 	robot->drive_to_point(57.4, 101.5);
 	// turn to shoot
-	robot->turn_to_angle(143);
+	robot->turn_to_angle(148);
 	
 	// shoot
 	robot->indexer->repeat(3, 1000, 100);
