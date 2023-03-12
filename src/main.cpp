@@ -94,7 +94,7 @@ void fire_loop() {
         }
 
 		if(controller->newly_pressed(DIGITAL_DOWN)) {
-			robot->indexer->repeat(7, 1000, 100);
+			robot->indexer->repeat(9, 1000, 100);
 		}
 
 		pros::delay(5);
@@ -157,6 +157,23 @@ void shoot() {
 
 void auto_left() {
 
+}
+
+void driver_matchloads() {
+	robot->flywheel->enable();
+	robot->flywheel->move(1900);
+	pros::delay(3000);
+	for(int i = 0; i < 8; i++) {
+		if(controller->pressed(DIGITAL_Y)) {
+			goto stop;
+		}
+
+		robot->indexer->index(100);
+		pros::delay(1000);
+	}
+	robot->indexer->index();
+	stop:
+	{};
 }
 
 void auto_right() {
@@ -351,7 +368,7 @@ void auto_skills() {
 
 	robot->turn_to_angle(-200); // turn to shoot endgame
 
-	//ADD FIRE ENDGAME
+	robot->endgame->fire();
 
 }
 
@@ -361,5 +378,7 @@ void autonomous() {
 }
 
 void opcontrol() {
+	driver_matchloads();
 	drive_loop();
+
 }
