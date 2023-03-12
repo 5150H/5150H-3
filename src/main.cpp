@@ -182,7 +182,7 @@ void auto_right() {
 	robot->drive_dist(5);
 
 	// turn to goal
-	robot->turn_to_angle(107.5);
+	robot->turn_to_angle(105.5);
 	// shoot 2 preloads
 	robot->indexer->repeat(2, 1000, 100);
 	// prepare lower flywheel velocity for next shots
@@ -213,7 +213,7 @@ void auto_right() {
 	// drive back
 	robot->drive_to_point(57.4, 101.5);
 	// turn to shoot
-	robot->turn_to_angle(145);
+	robot->turn_to_angle(143);
 	
 	// shoot
 	robot->indexer->repeat(3, 1000, 100);
