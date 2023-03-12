@@ -291,10 +291,9 @@ void auto_skills() {
 	robot->flywheel->enable();
 	robot->flywheel->move(1800);
 	
-	
 	//pros::delay(2750);
 
-	//robot->indexer->repeat(9, 1000);
+	robot->indexer->repeat(9, 1000);
 
 	// heading = 23.5	
 
@@ -308,7 +307,6 @@ void auto_skills() {
 	robot->drive_to_point(-129, -52, true);
 	robot->chassis->set_voltage_percent(100);
 
-
 	
 	//first roller - fixed
 	robot->turn_to_angle(8);
@@ -318,7 +316,7 @@ void auto_skills() {
 
 	//second roller - fixed
 	robot->turn_to_angle(-80);
-	robot->drive_dist_timeout(-26, 1000, 5);
+	robot->drive_dist_timeout(-32, 3000, 5);
 	pros::delay(250);
 
 	robot->drive_to_point(-100, -121);
@@ -331,9 +329,8 @@ void auto_skills() {
 	robot->turn_to_angle(-210); //turn to intake line of 3
 	robot->drive_to_point(11.8, -168.5, true); //intake line of 3
 
-	robot->turn_to_angle(-111); //turn to shoot 3
+	robot->turn_to_angle(-108); //turn to shoot 3
 	robot->indexer->repeat(3, 1000, 100);
-
 
 	robot->drive_to_point(36, -101, true); //drive to intake first opp line of 3
 
@@ -341,7 +338,7 @@ void auto_skills() {
 
 	robot->turn_to_angle(-206.5); // align to intake opp line of 3
 
-	robot->flywheel->move(1900); //speed up flywheel
+	robot->flywheel->move(2000); //speed up flywheel
 
 	robot->drive_to_point(120.4, -143.8, true); // intake opp line of 3
 
@@ -358,7 +355,7 @@ void auto_skills() {
 
 	robot->turn_to_angle(-160); //turn into roller
 
-	robot->drive_dist(-6); //drive into roller
+	robot->drive_dist_timeout(-16, 3000); //drive into roller
 
 	robot->intake->move_voltage(12000); //run roller
 
@@ -368,13 +365,14 @@ void auto_skills() {
 
 	robot->turn_to_angle(-200); // turn to shoot endgame
 
+	robot->drive_dist(-30);
+
 	robot->endgame->fire();
 
 }
 
 void autonomous() {
 	auto_skills();
-
 }
 
 void opcontrol() {
