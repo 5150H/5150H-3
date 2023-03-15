@@ -1,5 +1,6 @@
 #pragma once
 #include "main.h"
+#include "pros/llemu.hpp"
 #include "pros/rtos.hpp"
 #include <cmath>
 #include <mutex>
@@ -360,6 +361,7 @@ class Flywheel {
 	bool enabled = false;
 	bool bangbang = false;
 
+
     void loop() {
         unsigned long interval = controller->get_interval();
         while (true) {
@@ -375,7 +377,8 @@ class Flywheel {
 					}
 				} else {
 					double reading = (sensor.get_velocity() / 360.0 * 60.0);
-                	double voltage = controller->step(reading);
+                	double voltage = std::max(0.0, controller->step(reading));
+					pros::lcd::print(6, "MV: %f", voltage);
 					motors.move_voltage(voltage);
 				}
             } else {

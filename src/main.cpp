@@ -120,7 +120,7 @@ void initialize() {
 	auto flywheel = Flywheel::create(
 		{-10},
 		pros::Rotation(9),
-		PID::create(10.5, 0, 0, 800, 3, 10)
+		PID::create(50, 0, 0, 478.09, 3.14, 10) // 
 		);
 
 	auto indexer = Indexer::create(
