@@ -125,7 +125,7 @@ void initialize() {
 
 	auto indexer = Indexer::create(
 		pros::ADIDigitalOut('B'), 
-		50, 250);
+		100, 200);
 
 	auto anglechg = Anglechg::create(
 		pros::ADIDigitalOut('A'));
