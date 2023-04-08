@@ -4,6 +4,15 @@
 #include "pros/rtos.hpp"
 #include <cmath>
 #include <mutex>
+#include <numeric>
+
+#define LOG_DEBUG false
+
+#ifdef LOG_DEBUG
+	#define LOG(message) std::cout << message
+#else
+	#define LOG(message)
+#endif
 
 constexpr double INCH_TO_CM = 2.54;
 constexpr double RADIAN_TO_DEGREE = (180.0 / M_PI);
@@ -47,10 +56,11 @@ public:
         if (time - prev_time < interval) {
             return output;
         }
+
 		p = kp * error;
 		i += ki * error;
         d = kd * (reading - prev_reading) * -1;
-        b = std::copysign(kb, error);
+        b = std::copysign(kb, reading);
         f = kf * setpoint;
 
         // reset integral on zero cross
@@ -251,6 +261,9 @@ class Chassis {
 	double voltage_percent = 1;
 	double velocity_percent = 1;
 
+	double voltage_max = 12000;
+	double velocity_max = 200;
+
 	inline double exp_drive(int32_t power, int32_t exponent) {
 		auto value = std::pow((power / 127.0), exponent) / static_cast<double>(std::pow(1, exponent - 1));
     	return value  * 127;
@@ -260,6 +273,14 @@ public:
 	Chassis(std::initializer_list<int8_t> ileft, std::initializer_list<int8_t> iright, double iexp_power = 1, double iexp_turn = 1) : 
 	left(ileft), right(iright), exp_power(iexp_power), exp_turn(iexp_turn) {
 	};
+
+	inline void set_voltage_max(double max) {
+		voltage_max = max;
+	}
+
+	inline void set_velocity_max(double max) {
+		velocity_max = max;
+	}
 
 	inline void set_voltage_percent(double percent) {
 		percent /= 100.0;
@@ -272,13 +293,13 @@ public:
 	}
 
 	inline void move_voltage(int32_t power, int32_t turn) {
-		left.move_voltage((power + turn) * voltage_percent);
-		right.move_voltage((power - turn) * voltage_percent);
+		left.move_voltage(std::clamp((power + turn) * voltage_percent, -voltage_max, voltage_max));
+		right.move_voltage(std::clamp((power - turn) * voltage_percent, -voltage_max, voltage_max));
 	}
 
 	inline void move_velocity(int32_t power, int32_t turn) {
-		left.move_velocity((power + turn) * velocity_percent);
-		right.move_velocity((power - turn) * velocity_percent);
+		left.move_velocity(std::clamp((power + turn) * velocity_percent, -velocity_max, velocity_max));
+		right.move_velocity(std::clamp((power - turn) * velocity_percent, -velocity_max, velocity_max));
 	}
 
 	inline void drive_voltage(int32_t voltage) {
@@ -361,24 +382,41 @@ class Flywheel {
 	bool enabled = false;
 	bool bangbang = false;
 
+	double prev_pos = 0;
+	double prev_vel = 0;
 
     void loop() {
         unsigned long interval = controller->get_interval();
+		auto interval_in_sec = interval / 1000.0;
+		const double alpha = 0.1;
+		double filtered = 0;
+
         while (true) {
             std::unique_lock<pros::Mutex> guard(lock);
         
             if (enabled) {
 				if (bangbang) {
 					double reading = (sensor.get_velocity() / 360.0 * 60.0);
-					if (reading < controller->get_setpoint()) {
-						motors.move_voltage(12000);
-					} else {
-						motors.move_voltage(0);
-					}
+					double setpoint = controller->get_setpoint();
+					double diff = setpoint - reading;
+
 				} else {
-					double reading = (sensor.get_velocity() / 360.0 * 60.0);
-                	double voltage = std::max(0.0, controller->step(reading));
+					double pos = sensor.get_position();
+					double delta_pos = (pos - prev_pos) / interval_in_sec;
+
+					double vel = (sensor.get_velocity() / 360.0 * 60.0);
+					double accel = (vel - prev_vel) / interval_in_sec;
+
+					auto mreading = motors.get_actual_velocities().at(0) * 18.0;
+					filtered = (alpha * mreading) + (1.0 - alpha) * filtered;
+
+                	double voltage = std::clamp(controller->step(vel), 0.0, 12000.0);
 					pros::lcd::print(6, "MV: %f", voltage);
+					std::cout << controller->get_setpoint() << "," << voltage << "," << vel << "," << accel << "\n";
+					
+					prev_pos = pos;
+					prev_vel = vel;
+					
 					motors.move_voltage(voltage);
 				}
             } else {
@@ -393,7 +431,8 @@ class Flywheel {
 public:
 	Flywheel(std::initializer_list<int8_t> imotors, pros::Rotation isensor, std::unique_ptr<PID> icontroller) : 
 	motors(imotors), sensor(isensor), controller(std::move(icontroller)), thread([&] { this->loop(); }) {
-        sensor.set_data_rate(5);
+        sensor.set_data_rate(10);
+		
 	}
 
 	inline void move(double rpm) {
@@ -431,6 +470,11 @@ public:
 
 	inline void use_pidf() {
 		bangbang = false;
+	}
+
+	inline double get_reading() {
+		std::lock_guard<pros::Mutex> guard(lock);
+		return sensor.get_velocity() / 360.0 * 60.0;
 	}
 
 	inline static std::unique_ptr<Flywheel> create(std::initializer_list<int8_t> imotors, pros::Rotation isensor, std::unique_ptr<PID> icontroller) {
@@ -487,6 +531,7 @@ public:
 		for(int i = 0; i < times - 1; i++) {
 			index(delay);
 			pros::delay(interval);
+			std::cout << "waited interval\n";
 		}
 		index(delay);
 	}
@@ -604,50 +649,8 @@ public:
 	endgame(std::move(iendgame)) {
 	}
 
-    inline void drive_dist(double cm, double error_threshold = 2, unsigned long required_time = 250) {
-        std::cout << "[PID] Driving " << cm << " cm\n";
-
-		double straight = controllers->odom->heading();
-        double offset = controllers->odom->forward();
-        controllers->drive->target(cm);
-        unsigned long interval = controllers->drive->get_interval();
-        
-        bool settling = false;
-        unsigned long settled_time = 0;
-        while (true) {
-            if (!settling && std::abs(controllers->drive->get_error()) < error_threshold) {
-                settled_time = pros::millis();
-                settling = true;
-            }
-
-            if(settling) {
-                if (std::abs(controllers->drive->get_error()) < error_threshold) {
-                    unsigned long current_time = pros::millis();
-                    unsigned long diff_time = current_time - settled_time;
-                    if (diff_time > required_time) {
-                        break;
-                    }
-                } else {
-                    settling = false;
-                }
-            }
-
-            double dist = controllers->odom->forward() - offset;
-			double drift = constrain_angle_180(controllers->odom->heading() - straight);
-
-            double power = controllers->drive->step(dist);
-			double turn = controllers->angle->step(drift);
-
-            chassis->move_voltage(power, turn);
-            pros::delay(interval);
-        }   
-        
-        chassis->stop();
-        std::cout << "[PID] Finished movement at " << controllers->drive->get_error() << " cm error.\n";
-    }
-
 	inline void drive_dist_timeout(double cm, unsigned long timeout, double error_threshold = 2, unsigned long required_time = 250) {
-		std::cout << "[PID] Driving " << cm << " cm\n";
+		LOG("[PID] Driving " << cm << " cm\n");
 
 		double straight = controllers->odom->heading();
         double offset = controllers->odom->forward();
@@ -687,56 +690,23 @@ public:
             double power = controllers->drive->step(dist);
 			double turn = controllers->angle->step(drift);
 
+
+			//std::cout << controllers->drive->get_setpoint() << "," << controllers->drive->get_reading() << "\n";
+
             chassis->move_voltage(power, turn);
             pros::delay(interval);
         }   
         
         chassis->stop();
-        std::cout << "[PID] Finished movement at " << controllers->drive->get_error() << " cm error.\n";
+        LOG("[PID] Finished movement at " << controllers->drive->get_error() << " cm error.\n");
 	}
 
-	inline void turn_angle(double degrees, double error_threshold = 1, unsigned long required_time = 250) {
-        std::cout << "[PID] Turning " << degrees << " degrees\n";
-
-        double offset = controllers->odom->raw_heading();
-        controllers->turn->target(degrees);
-
-        unsigned long interval = controllers->turn->get_interval();
-        
-        bool settling_err = false;
-        unsigned long err_time = 0;
-        while (true) {
-
-            if (!settling_err && std::abs(controllers->turn->get_error()) < error_threshold) {
-                err_time = pros::millis();
-                settling_err = true;
-            }
-
-            if(settling_err) {
-                if (std::abs(controllers->turn->get_error()) < error_threshold) {
-                    unsigned long current_time = pros::millis();
-                    unsigned long diff_time = current_time - err_time;
-                    if (diff_time > required_time) {
-                        break;
-                    } 
-				} else {
-                    settling_err = false;
-                }
-            }
-
-            double turn = controllers->odom->raw_heading() - offset;
-            double voltage = controllers->turn->step(turn);
-			//std::cout << "Error: " << controllers->turn->get_error() << "\n";
-            chassis->turn_voltage(voltage);
-            pros::delay(interval);
-        }   
-        
-        chassis->stop();
-        std::cout << "[PID] Finished movement at " << controllers->turn->get_error() << " degrees error.\n\n";
+	inline void drive_dist(double cm, double error_threshold = 2, unsigned long required_time = 100) {
+        drive_dist_timeout(cm, LONG_MAX, error_threshold, required_time);
     }
 
-	inline void turn_angle_timeout(double degrees, unsigned long timeout, double error_threshold = 1, unsigned long required_time = 250) {
-        std::cout << "[PID] Turning " << degrees << " degrees\n";
+	inline void turn_angle_timeout(double degrees, unsigned long timeout, double error_threshold = 1, unsigned long required_time = 100) {
+        LOG("[PID] Turning " << degrees << " degrees\n");
 
         double offset = controllers->odom->raw_heading();
         controllers->turn->target(degrees);
@@ -773,42 +743,45 @@ public:
 
             double turn = controllers->odom->raw_heading() - offset;
             double voltage = controllers->turn->step(turn);
-			//std::cout << "Error: " << controllers->turn->get_error() << "\n";
+
+			//std::cout << controllers->turn->get_setpoint() << "," << controllers->turn->get_reading() << "\n";
+
             chassis->turn_voltage(voltage);
             pros::delay(interval);
         }   
         
         chassis->stop();
-        std::cout << "[PID] Finished movement at " << controllers->turn->get_error() << " degrees error.\n\n";
+        LOG("[PID] Finished movement at " << controllers->turn->get_error() << " degrees error.\n\n");
     }
 
-	inline void turn_to_angle(double degrees, double error_threshold = 5) {
-		double heading = controllers->odom->heading();
-		double diff = constrain_angle_180(degrees - heading);
-		std::cout << "[PID] Turning to angle " << degrees << "\n";
-		turn_angle(diff, error_threshold);
+	inline void turn_angle(double degrees, double error_threshold = 1, unsigned long required_time = 250) {
+        turn_angle_timeout(degrees, LONG_MAX, error_threshold, required_time);
+    }
+
+	inline void turn_to_angle(double degrees, double error_threshold = 5, unsigned long required_time = 250) {
+		turn_to_angle_timeout(degrees, LONG_MAX, error_threshold, required_time);
 	}
 
-	inline void turn_to_angle_timeout(double degrees, unsigned long ms, double error_threshold = 5) {
+	inline void turn_to_angle_timeout(double degrees, unsigned long ms, double error_threshold = 5, unsigned long required_time = 250) {
 		double heading = controllers->odom->heading();
 		double diff = constrain_angle_180(degrees - heading);
-		std::cout << "[PID] Turning to angle " << degrees << "\n";
-		turn_angle_timeout(diff, ms, error_threshold);
+		LOG("[PID] Turning to angle " << degrees << "\n");
+		turn_angle_timeout(diff, ms, error_threshold, required_time);
 	}
 
 	inline void turn_to_point(double x, double y, bool reverse = false) {
 		double angle = calc_angle_to_point(x, y, reverse);
-		std::cout << "[Odom] Turning to point (" << x << ", " << y << ")\n";
-		std::cout << "[Odom] Calculated angle " << angle << " degrees to point\n";
+		LOG("[Odom] Turning to point (" << x << ", " << y << ")\n");
+		LOG("[Odom] Calculated angle " << angle << " degrees to point\n");
 		turn_to_angle(angle);
 	}
 
 	inline void drive_to_point(double x, double y, bool reverse = false) {
-		std::cout << "[Odom] Beginning movement to point (" << x << ", " << y << ")\n";
+		LOG("[Odom] Beginning movement to point (" << x << ", " << y << ")\n");
 		turn_to_point(x, y, reverse);
 		double dist = calc_dist_to_point(x, y, reverse);
-		std::cout << "[Odom] Driving to point (" << x << ", " << y << ")\n";
-		std::cout << "[Odom] Calculated dist " << dist << " cm to point\n";
+		LOG("[Odom] Driving to point (" << x << ", " << y << ")\n");
+		LOG("[Odom] Calculated dist " << dist << " cm to point\n");
 		drive_dist(dist);
 	}
 

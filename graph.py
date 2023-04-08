@@ -1,22 +1,16 @@
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 
+data = pd.read_csv('vs.csv', encoding='UTF-16', sep=',')
 
+reading = data["reading"]
+setpoint = data["setpoint"]
 
-data = np.genfromtxt("vs.csv", delimiter=",")
-#define data
+plt.plot(setpoint, label="setpoint")
+plt.plot(reading, label="reading")
+plt.legend(loc="lower right")
+plt.xlabel("time")
+plt.ylabel("cm")
 
-y = data[:, 0]
-x = data[:, 1]
-
-#find line of best fit
-a, b = np.polyfit(x, y, 1)
-
-#add points to plot
-plt.scatter(x, y)
-
-#add line of best fit to plot
-plt.plot(x, a*x+b)
-
-plt.text(2000, 0, 'y = '+ '{:.2f}'.format(a) + 'x + ' + '{:.2f}'.format(b) , size=14)
 plt.show()

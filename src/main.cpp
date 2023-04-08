@@ -7,7 +7,7 @@
 std::unique_ptr<Robot> robot = nullptr;
 std::unique_ptr<Controller> controller = Controller::create(pros::Controller(pros::E_CONTROLLER_MASTER));
 
-constexpr int32_t FLYWHEEL_NORMAL_RPM = 2100;
+constexpr int32_t FLYWHEEL_NORMAL_RPM = 1900;
 constexpr int32_t FLYWHEEL_ANGLECHG_RPM = 2000;
 constexpr int32_t FLYWHEEL_OVERFILL_RPM = 1900;
 
@@ -89,20 +89,22 @@ void fire_loop() {
             if(controller->pressed(DIGITAL_R2)) {
                 robot->indexer->index();
             } else {
-                robot->indexer->repeat(3);
+				robot->indexer->repeat(3);
             }
         }
 		pros::delay(5);
 	}
 }
 
+
+
 void initialize() {
 	pros::lcd::initialize();
 	pros::Task pl(print_loop);
 	pros::Task fl(fire_loop);
 	auto controllers = Controllers::create(
-		PID::create(500, 50, 80, 0, 0, 20),
-		PID::create(490, 10, 45, 950, 0, 20),
+		PID::create(600, 0, 62.5, 0, 0, 20),
+		PID::create(500, 0, 50, 0, 0, 20),
 		PID::create(0, 0, 0, 0, 0, 20),
 		Odom::create(
 			pros::Rotation(8), pros::Rotation(6, true), 
@@ -112,7 +114,7 @@ void initialize() {
 	auto chassis = Chassis::create(
 		{19, -17, -18}, 
 		{-12,11, 13},
-		1, 5);
+		1, 1);
 
 	auto intake = Intake::create(
 		{-1});
@@ -120,7 +122,7 @@ void initialize() {
 	auto flywheel = Flywheel::create(
 		{-10},
 		pros::Rotation(9),
-		PID::create(50, 0, 0, 478.09, 3.14, 10) // 
+		PID::create(100, 0, 0, 895.0, 2.6, 10) // 
 		);
 
 	auto indexer = Indexer::create(
@@ -141,13 +143,6 @@ void initialize() {
 		std::move(indexer),
 		std::move(anglechg),
 		std::move(endgame));
-}
-
-void shoot() {
-	robot->indexer->extend();
-	pros::delay(100);
-	robot->indexer->retract();
-
 }
 
 void auto_left() {
@@ -373,5 +368,9 @@ void autonomous() {
 }
 
 void opcontrol() {
+	//robot->turn_angle_timeout(45, 5000);
+	//robot->turn_angle_timeout(90, 5000);
+	//robot->turn_angle_timeout(135, 5000);
+	//robot->turn_angle_timeout(180, 5000);
 	drive_loop();
 }
