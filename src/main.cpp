@@ -15,7 +15,7 @@ void print_loop() {
 	while (true) {
 		auto pos = robot->controllers->odom->position();
 		auto rpm = robot->flywheel->rpm();
-
+ 
 		pros::lcd::print(0, "X: %f cm", pos.x);
 		pros::lcd::print(1, "Y: %f cm", pos.y);
 		pros::lcd::print(2, "Heading: %f degrees", pos.heading);
@@ -104,7 +104,7 @@ void initialize() {
 	pros::Task fl(fire_loop);
 	auto controllers = Controllers::create(
 		PID::create(600, 0, 62.5, 0, 0, 20),
-		PID::create(500, 0, 50, 0, 0, 20),
+		PID::create(615, 20, 55, 0, 0, 20),
 		PID::create(0, 0, 0, 0, 0, 20),
 		Odom::create(
 			pros::Rotation(8), pros::Rotation(6, true), 
@@ -182,8 +182,7 @@ void auto_right() {
 	robot->indexer->repeat(2, 1000, 100);
 	// prepare lower flywheel velocity for next shots
 	robot->flywheel->move(2225);
-	
-	
+		
 	// start intake
 	robot->intake->move_voltage(12000);
 	// turn to 3line
@@ -197,7 +196,7 @@ void auto_right() {
 
 	// drive back
 	robot->drive_dist(15);
-	robot->turn_to_angle(147);
+	robot->turn_to_angle(137);
 	robot->indexer->repeat(3, 1000, 100);
 	robot->flywheel->move(2275);
 
@@ -205,9 +204,9 @@ void auto_right() {
 	robot->drive_dist_timeout(-25, 550, 7.5);
 
 	// drive back
-	robot->drive_to_point(57.4, 101.5);
+	robot->drive_to_point(57.4, 100.5);
 	// turn to shoot
-	robot->turn_to_angle(148);
+	robot->turn_to_angle(137);
 	
 	// shoot
 	robot->indexer->repeat(3, 1000, 100);
