@@ -104,7 +104,7 @@ void initialize() {
 	pros::Task fl(fire_loop);
 	auto controllers = Controllers::create(
 		PID::create(600, 0, 62.5, 0, 0, 20),
-		PID::create(615, 20, 55, 0, 0, 20),
+		PID::create(400, 5, 45, 900, 0, 20),
 		PID::create(0, 0, 0, 0, 0, 20),
 		Odom::create(
 			pros::Rotation(8), pros::Rotation(6, true), 
@@ -122,7 +122,7 @@ void initialize() {
 	auto flywheel = Flywheel::create(
 		{-10},
 		pros::Rotation(9),
-		PID::create(100, 0, 0, 895.0, 2.6, 10) // 
+		PID::create(175, 0, 0, 895.0, 2.6, 10) // 
 		);
 
 	auto indexer = Indexer::create(
@@ -149,14 +149,33 @@ void auto_left() {
 	// start flywheel
 	robot->flywheel->enable();
 	robot->flywheel->use_pidf();
-	robot->flywheel->move(2400);
+	robot->flywheel->move(2375);
 
 	robot->drive_dist_timeout(-7.5, 1000, 5);
 	robot->intake->move_for_voltage(250, 12000);
-	robot->drive_dist(10);
-	robot->turn_to_angle(-3);
+	robot->drive_dist(15);
+	robot->turn_to_angle(-5);
+	pros::delay(2000);
+	robot->indexer->repeat(2, 300, 200);
+	robot->flywheel->move(2150);
+	
+	robot->turn_to_angle(-135);
+	robot->chassis->set_velocity_percent(75);
+	robot->drive_dist(-60);
+	robot->chassis->set_velocity_percent(100);
+	robot->intake->move_voltage(12000);
 
-	robot->indexer->repeat(2, 1000, 100);
+	robot->chassis->set_voltage_percent(50);
+	robot->drive_dist(-70);
+	robot->chassis->set_voltage_percent(100);
+
+	robot->turn_to_angle(-35);
+	robot->indexer->repeat(3, 300, 200);
+
+	robot->turn_to_angle(-135);
+	robot->drive_dist(-140);
+
+	robot->turn_to_angle(90);
 }
 
 void auto_right() {
@@ -362,14 +381,9 @@ void auto_skills_old() {
 }
 
 void autonomous() {
-	auto_right();
-
+	auto_left();
 }
 
 void opcontrol() {
-	//robot->turn_angle_timeout(45, 5000);
-	//robot->turn_angle_timeout(90, 5000);
-	//robot->turn_angle_timeout(135, 5000);
-	//robot->turn_angle_timeout(180, 5000);
 	drive_loop();
 }

@@ -293,8 +293,8 @@ public:
 	}
 
 	inline void move_voltage(int32_t power, int32_t turn) {
-		left.move_voltage(std::clamp((power + turn) * voltage_percent, -voltage_max, voltage_max));
-		right.move_voltage(std::clamp((power - turn) * voltage_percent, -voltage_max, voltage_max));
+		left.move_voltage((power + turn) * voltage_percent);
+		right.move_voltage((power - turn) * voltage_percent);
 	}
 
 	inline void move_velocity(int32_t power, int32_t turn) {
@@ -410,9 +410,9 @@ class Flywheel {
 					auto mreading = motors.get_actual_velocities().at(0) * 18.0;
 					filtered = (alpha * mreading) + (1.0 - alpha) * filtered;
 
-                	double voltage = std::clamp(controller->step(vel), 0.0, 12000.0);
+                	double voltage = std::clamp(controller->step(filtered), 0.0, 12000.0);
 					pros::lcd::print(6, "MV: %f", voltage);
-					std::cout << controller->get_setpoint() << "," << voltage << "," << vel << "," << accel << "\n";
+					//std::cout << controller->get_setpoint() << "," << voltage << "," << vel << "," << accel << "\n";
 					
 					prev_pos = pos;
 					prev_vel = vel;
@@ -705,7 +705,7 @@ public:
         drive_dist_timeout(cm, LONG_MAX, error_threshold, required_time);
     }
 
-	inline void turn_angle_timeout(double degrees, unsigned long timeout, double error_threshold = 1, unsigned long required_time = 100) {
+	inline void turn_angle_timeout(double degrees, unsigned long timeout, double error_threshold = 2, unsigned long required_time = 100) {
         LOG("[PID] Turning " << degrees << " degrees\n");
 
         double offset = controllers->odom->raw_heading();
@@ -754,15 +754,15 @@ public:
         LOG("[PID] Finished movement at " << controllers->turn->get_error() << " degrees error.\n\n");
     }
 
-	inline void turn_angle(double degrees, double error_threshold = 1, unsigned long required_time = 250) {
+	inline void turn_angle(double degrees, double error_threshold = 2, unsigned long required_time = 250) {
         turn_angle_timeout(degrees, LONG_MAX, error_threshold, required_time);
     }
 
-	inline void turn_to_angle(double degrees, double error_threshold = 5, unsigned long required_time = 250) {
+	inline void turn_to_angle(double degrees, double error_threshold = 2, unsigned long required_time = 250) {
 		turn_to_angle_timeout(degrees, LONG_MAX, error_threshold, required_time);
 	}
 
-	inline void turn_to_angle_timeout(double degrees, unsigned long ms, double error_threshold = 5, unsigned long required_time = 250) {
+	inline void turn_to_angle_timeout(double degrees, unsigned long ms, double error_threshold = 2, unsigned long required_time = 250) {
 		double heading = controllers->odom->heading();
 		double diff = constrain_angle_180(degrees - heading);
 		LOG("[PID] Turning to angle " << degrees << "\n");
