@@ -737,8 +737,11 @@ public:
             }
 
 			unsigned long current_time = pros::millis();
-			if (current_time - start_time > timeout) {
+			auto time_diff = current_time - start_time;
+			if (time_diff > timeout) {
 				break;
+			} else if (timeout != LONG_MAX) {
+				//std::cout << "time diff: " << time_diff << ", timeout: " << timeout << "\n";
 			}
 
             double turn = controllers->odom->raw_heading() - offset;
@@ -785,6 +788,12 @@ public:
 		drive_dist(dist);
 	}
 
+	inline void drive_to_point_noturn(double x, double y, bool reverse = false) {
+		double dist = calc_dist_to_point(x, y, reverse);
+		LOG("[Odom] Driving to point (" << x << ", " << y << ")\n");
+		LOG("[Odom] Calculated dist " << dist << " cm to point\n");
+		drive_dist(dist);
+	}
 	inline static std::unique_ptr<Robot> create(
 		std::unique_ptr<Chassis> ichassis, 
 		std::unique_ptr<Controllers> icontrollers, 

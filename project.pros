@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "5150H-Worlds",
+    "project_name": "Worlds-Left",
     "target": "v5",
     "templates": {
       "kernel": {

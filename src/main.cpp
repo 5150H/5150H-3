@@ -102,6 +102,8 @@ void initialize() {
 	pros::lcd::initialize();
 	pros::Task pl(print_loop);
 	pros::Task fl(fire_loop);
+
+
 	auto controllers = Controllers::create(
 		PID::create(600, 0, 62.5, 0, 0, 20),
 		PID::create(400, 5, 45, 900, 0, 20),
@@ -122,12 +124,12 @@ void initialize() {
 	auto flywheel = Flywheel::create(
 		{-10},
 		pros::Rotation(9),
-		PID::create(175, 0, 0, 895.0, 2.6, 10) // 
+		PID::create(150, 0, 0, 895.0, 2.6, 10) // 
 		);
 
 	auto indexer = Indexer::create(
 		pros::ADIDigitalOut('B'), 
-		100, 200);
+		100, 200); //150, 265
 
 	auto anglechg = Anglechg::create(
 		pros::ADIDigitalOut('A'));
@@ -145,146 +147,170 @@ void initialize() {
 		std::move(endgame));
 }
 
-void auto_left() {
+void auto_solo() {
 	// start flywheel
 	robot->flywheel->enable();
 	robot->flywheel->use_pidf();
-	robot->flywheel->move(2375);
+	robot->flywheel->move(2400); 
 
+	//get roller
 	robot->drive_dist_timeout(-7.5, 1000, 5);
 	robot->intake->move_for_voltage(250, 12000);
 	robot->drive_dist(15);
-	robot->turn_to_angle(-5);
-	pros::delay(2000);
-	robot->indexer->repeat(2, 300, 200);
-	robot->flywheel->move(2150);
 	
+	//shoot preload
+	robot->turn_to_angle(-6);
+	pros::delay(1500);
+	robot->indexer->repeat(2, 300, 200);
+	robot->flywheel->move(2200);
+	
+
+	//bump line of 3
 	robot->turn_to_angle(-135);
-	robot->chassis->set_velocity_percent(75);
+	robot->chassis->set_velocity_percent(67);
 	robot->drive_dist(-60);
 	robot->chassis->set_velocity_percent(100);
 	robot->intake->move_voltage(12000);
 
+	//intake of 3 
 	robot->chassis->set_voltage_percent(50);
-	robot->drive_dist(-70);
+	//robot->drive_dist(-75);
+	robot->drive_to_point_noturn(114.6, 96.2, true);
+	
 	robot->chassis->set_voltage_percent(100);
 
-	robot->turn_to_angle(-35);
+	//shoot line of 3
+	robot->turn_to_angle(-37.75);
 	robot->indexer->repeat(3, 300, 200);
 
-	robot->turn_to_angle(-135);
-	robot->drive_dist(-140);
+	//set for far 3 shots
+	robot->flywheel->move(2400);
 
-	robot->turn_to_angle(90);
+	//intake line of 3
+	robot->turn_to_angle(-140);
+	robot->chassis->set_voltage_percent(90);
+	robot->drive_dist(-185);
+
+	//roller
+	robot->turn_to_angle(-90);
+	robot->drive_dist_timeout(-7.5, 1000, 5);
+	robot->intake->move_for_voltage(250, 12000);
+	robot->drive_dist(15);
+
+	//shoot 3
+	robot->turn_to_angle(-78.8);
+	robot->indexer->repeat(3, 325, 100);
+}
+
+void auto_left() {
+	// start flywheel
+
+
+	robot->flywheel->enable();
+	robot->flywheel->use_pidf();
+	robot->flywheel->move(2340); 
+
+	//get roller
+	robot->drive_dist_timeout(-7.5, 1000, 5);
+	robot->intake->move_for_voltage(250, 12000);
+	robot->drive_dist(15);
+	
+	//shoot preload
+	robot->turn_to_angle(-5.75);
+	pros::delay(1250);
+	robot->indexer->repeat(2, 300, 200);
+	robot->flywheel->move(2200);
+	
+	//bump line of 3
+	robot->turn_to_angle(-135);
+	robot->chassis->set_velocity_percent(45);
+	robot->drive_dist(-58);
+	robot->chassis->set_velocity_percent(100);
+	robot->intake->move_voltage(12000);
+
+	//intake of 3 
+	robot->chassis->set_voltage_percent(50);
+	//robot->drive_dist(-75);
+
+	robot->drive_to_point_noturn(101.25, 84.25, true);
+	
+	robot->chassis->set_voltage_percent(100);
+
+	robot->drive_to_point_noturn(87.25, 75.3);
+
+	//shoot line of 3
+	robot->turn_to_angle(-30.5);
+	robot->indexer->repeat(3, 300, 200);
+
+	robot->flywheel->move(2220);
+
+	//boomerang
+
+	robot->turn_to_angle(-60);
+	robot->drive_dist(-42, 10, 850); //-38
+
+	robot->drive_to_point_noturn(87.25, 75.3);
+
+	//shoot line of 3
+	robot->turn_to_angle(-31.5);
+	robot->indexer->repeat(3, 300, 200);
+
 }
 
 void auto_right() {
 	// start flywheel
 	robot->flywheel->enable();
 	robot->flywheel->use_pidf();
-	robot->flywheel->move(2460);
+	robot->flywheel->move(2440);
 	
 	// drive to roller
-	robot->drive_dist_timeout(-50, 750, true);
+	robot->drive_dist_timeout(-55, 750, true);
 	// turn to face roller
 	robot->turn_to_angle(90);
 	// drive into roller
-	robot->drive_dist_timeout(-15, 1000, 5);
+	robot->drive_dist_timeout(-10, 1000, 5);
 	// spin for 250ms
-	robot->intake->move_for_voltage(250, 12000);
+	robot->intake->move_for_voltage(275, 12000);
 	// drive away
 	robot->drive_dist(5);
 
 	// turn to goal
-	robot->turn_to_angle(103.5);
+	robot->turn_to_angle(107.5);
+	pros::delay(350);
 	// shoot 2 preloads
-	robot->indexer->repeat(2, 1000, 100);
+	robot->indexer->repeat(2, 500, 200);
 	// prepare lower flywheel velocity for next shots
-	robot->flywheel->move(2225);
+	robot->flywheel->move(2160);
 		
 	// start intake
 	robot->intake->move_voltage(12000);
-	// turn to 3line
-	robot->turn_to_angle(222);
 
+	// turn to 3line
+	robot->turn_to_angle_timeout(228, 1000, 2.5);
 	
 	// drive and intake 3 line
-	robot->chassis->set_voltage_percent(65);
-	robot->drive_to_point(69.69, 107, true);
+	robot->chassis->set_voltage_percent(70);
+
+	robot->drive_to_point(51, 114.5, true);
+
 	robot->chassis->set_voltage_percent(100);
 
-	// drive back
-	robot->drive_dist(15);
-	robot->turn_to_angle(137);
-	robot->indexer->repeat(3, 1000, 100);
-	robot->flywheel->move(2275);
-
-	// drive into bomerang
-	robot->drive_dist_timeout(-25, 550, 7.5);
+	robot->turn_to_angle(140);
+	robot->indexer->repeat(3, 400, 200);
+	robot->flywheel->move(2160);
+	
+	// drive into boomerang
+	robot->drive_dist_timeout(-26, 1000, 7.5);
 
 	// drive back
-	robot->drive_to_point(57.4, 100.5);
+	robot->drive_to_point(51, 114.5);
 	// turn to shoot
-	robot->turn_to_angle(137);
+	robot->turn_to_angle(141);
 	
 	// shoot
-	robot->indexer->repeat(3, 1000, 100);
-}
-
-void auto_right_special() {
-	// start flywheel
-	robot->flywheel->enable();
-	robot->flywheel->use_pidf();
-	robot->flywheel->move(2400);
-	
-	// drive to roller
-	robot->drive_dist(-68,5, true);
-	// turn to face roller
-	robot->turn_to_angle(90);
-	// drive into roller
-	robot->drive_dist_timeout(-15, 750, 5);
-	// spin for 250ms
-	robot->intake->move_for_voltage(250, 12000);
-	// drive away
-	robot->drive_dist(5);
-
-	// turn to goal
-	robot->turn_to_angle(105.5);
-	// shoot 2 preloads
-	robot->indexer->repeat(3, 750, 100);
-	// prepare lower flywheel velocity for next shots
-	robot->flywheel->move(2240);
-	
-	
-	// start intake
-	robot->intake->move_voltage(12000);
-	// turn to 3line
-	robot->turn_to_angle(222);
+	robot->indexer->repeat(3, 300, 200);
 
 	
-	// drive and intake 3 line
-	robot->chassis->set_voltage_percent(65);
-	robot->drive_to_point(51.14, 107, true);
-	robot->chassis->set_voltage_percent(100);
-
-	// drive back
-	robot->drive_dist(15);
-
-	robot->turn_to_angle(145);
-	robot->indexer->repeat(3, 750, 100);
-	robot->flywheel->move(2250);
-
-	// drive into bomerang
-	robot->drive_dist_timeout(-6.5, 10000, 7.5);
-
-/*
-	// drive back
-	robot->drive_to_point(75.4, 101.5, true);
-	// turn to shoot
-	robot->turn_to_angle(143);
-	
-	// shoot
-	robot->indexer->repeat(3, 1000, 100);*/
 }
 
 void auto_skills() {
@@ -381,9 +407,11 @@ void auto_skills_old() {
 }
 
 void autonomous() {
-	auto_left();
+	pros::Task auto_(auto_left);
+	fire_loop();
 }
 
 void opcontrol() {
-	drive_loop();
+	pros::Task drive(drive_loop);
+	fire_loop();
 }
